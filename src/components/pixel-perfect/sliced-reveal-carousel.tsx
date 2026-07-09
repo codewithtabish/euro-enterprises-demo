@@ -9,11 +9,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 const SLIDES = [
-  { seed: "slice-01", title: "Cerulean Coast", tag: "Nº 01 — Voyage" ,imageUrl:"/hero/one.jpg"},
   { seed: "slice-02", title: "Ash & Amber", tag: "Nº 02 — Terrain",imageUrl:"/hero/two.jpg" },
   { seed: "slice-03", title: "Field Studies", tag: "Nº 03 — Botanic" ,imageUrl:"/hero/three.jpg"},
   { seed: "slice-04", title: "Concrete Poems", tag: "Nº 04 — Metropolis",imageUrl:"/hero/four.jpg" },
   { seed: "slice-05", title: "Quiet Hours", tag: "Nº 05 — Interior" ,imageUrl:"/hero/five.jpg"},
+  { seed: "slice-01", title: "Cerulean Coast", tag: "Nº 01 — Voyage" ,imageUrl:"/hero/one.jpg"},
 ];
 
 // const imageUrl = (seed: string) => `https://picsum.photos/seed/${seed}/1400/900`;
