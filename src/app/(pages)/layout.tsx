@@ -2,23 +2,27 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/components/general/(themes)/theme-provider";
-import GradientDotMesh from "@/components/pixel-perfect/gradient-dot-mesh";
-import Footer from "@/components/general/(common)/footer";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Footer from "@/components/general/(common)/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
   title: "Euro Enterprises",
-  description: "Luxury Transportation",
+  description: "Premium Car Rental & Luxury Transportation",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -32,24 +36,22 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col relative overflow-x-hidden">
-        {/* Background Pattern - Only once */}
-
+      <body className="min-h-screen flex flex-col relative overflow-x-hidden bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {/* Main Content */}
-          <main className="flex-1 relative z-10">
-            <TooltipProvider>
-            {children}
+          <TooltipProvider>
+            {/* Main Content */}
+            <main className="flex-1 relative z-10">
+              {children}
+            </main>
 
-            </TooltipProvider>
-          </main>
+            <Footer />
+          </TooltipProvider>
         </ThemeProvider>
-        <Footer/>
       </body>
     </html>
   );

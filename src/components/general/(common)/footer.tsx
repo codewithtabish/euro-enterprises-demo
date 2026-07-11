@@ -21,7 +21,8 @@ const Footer = () => {
                 alt="EURO ENTERPRISES"
                 width={180}
                 height={60}
-                className="object-contain"
+                className="object-contain h-15 w-auto"   // ← Fixed
+                style={{ height: "60px", width: "auto" }}     // ← Extra safety
                 priority
               />
             </div>

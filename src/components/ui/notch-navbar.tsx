@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Home, User, Calendar, Zap, CreditCard, Menu, X } from "lucide-react";
+import { Home, User, Calendar, Zap, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { ModeToggle } from "../general/(themes)/theme-toggler";
@@ -48,7 +48,7 @@ export function NotchNavbar({ className, ...props }: React.HTMLAttributes<HTMLEl
         <div className="flex h-16 relative z-10 shrink-0 -ml-px">
           
           {/* Left Slice */}
-          <div className="w-[50px] h-full relative shrink-0">
+          <div className="w-12.5 h-full relative shrink-0">
             <div className="absolute inset-0 bg-zinc-50 dark:bg-black" style={{ clipPath: "path('M0 0 H50 V64 C25 64 25 40 0 40 Z')" }} />
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 50 64">
               <path d="M0 39.5 C25 39.5 25 63.5 50 63.5" fill="none" stroke="currentColor" strokeOpacity={0.05} strokeWidth={0.5} className="text-foreground" />
@@ -66,16 +66,17 @@ export function NotchNavbar({ className, ...props }: React.HTMLAttributes<HTMLEl
             <div className="relative w-full h-full flex items-center justify-between px-4 md:px-8">
               
               {/* Logo */}
-              <Link href="/" className="flex items-center gap-3 group mb-4 mr-4">
-                <Image
-                  src="/logo.png"
-                  alt="EURO ENTERPRISES"
-                  width={80}
-                  height={60}
-                  className="object-contain"
-                  priority
-                />
-              </Link>
+              {/* Logo */}
+<Link href="/" className="flex items-center gap-3 group">
+  <Image
+    src="/logo.png"
+    alt="EURO ENTERPRISES"
+    width={386}
+    height={386}
+    priority
+    className="h-15 w-auto object-contain"
+  />
+</Link>
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-8">
@@ -98,7 +99,7 @@ export function NotchNavbar({ className, ...props }: React.HTMLAttributes<HTMLEl
           </div>
 
           {/* Right Slice */}
-          <div className="w-[50px] h-full relative shrink-0 -ml-px">
+          <div className="w-12.5 h-full relative shrink-0 -ml-px">
             <div className="absolute inset-0 bg-zinc-50 dark:bg-black" style={{ clipPath: "path('M0 0 H50 V40 C25 40 25 64 0 64 Z')" }} />
             <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 50 64">
               <path d="M0 63.5 C25 63.5 25 39.5 50 39.5" fill="none" stroke="currentColor" strokeOpacity={0.05} strokeWidth={0.5} className="text-foreground" />

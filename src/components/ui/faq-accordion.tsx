@@ -81,7 +81,7 @@ export function FaqAccordion({
   };
 
   return (
-    <div className={cn("w-full max-w-3xl mx-auto py-8 relative font-sans", className)} {...props}>
+    <div className={cn("w-full max-w-3xl mx-auto py-8 relative font-sans my-10", className)} {...props}>
       <FaqHeader/>
       {title && (
         <h2 className="text-center font-bold text-2xl md:text-3xl mb-10 text-neutral-500 dark:text-neutral-400">
