@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Home, User, Calendar, Zap, CreditCard, Menu, X, Sun, Moon } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Home, User, Calendar, Zap, CreditCard, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
 import { ModeToggle } from "../general/(themes)/theme-toggler";
-import KineticTextLoader from "./kinetic-text-loader";
 
 const NavLink = ({ href, icon: Icon, label }: { 
   href: string; 
@@ -23,28 +22,7 @@ const NavLink = ({ href, icon: Icon, label }: {
   </Link>
 );
 
-const MobileThemeToggle = () => {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return <div className="w-9 h-9" />;
-
-  const isDark = theme === 'dark' || resolvedTheme === 'dark';
-
-  return (
-    <button
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-foreground/5 transition-colors text-foreground/70 hover:text-foreground"
-      aria-label="Toggle theme"
-    >
-      {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-    </button>
-  );
-};
-
-export function NotchNavbar({ className, logo, ...props }: React.HTMLAttributes<HTMLElement> & { logo?: React.ReactNode }) {
+export function NotchNavbar({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -52,12 +30,11 @@ export function NotchNavbar({ className, logo, ...props }: React.HTMLAttributes<
     { label: "About", href: "/about", icon: User },
     { label: "Events", href: "#events", icon: Calendar },
     { label: "Sponsors", href: "#sponsors", icon: Zap },
-    // { label: "Pricing", href: "#pricing", icon: CreditCard },
   ];
 
   return (
     <>
-      <header className={cn("fixed top-0 inset-x-0 z-50 h-16 flex px-0", className)} {...props}>
+      <header className={cn("fixed top-0 inset-x-0 z-50 h-16 flex px-0 pt-3", className)} {...props}>
         
         {/* Left Side Bar */}
         <div className="flex-1 h-10 bg-zinc-50 dark:bg-black z-20 relative min-w-0">
@@ -86,52 +63,31 @@ export function NotchNavbar({ className, logo, ...props }: React.HTMLAttributes<
               <line x1="0" y1="60.5" x2="100%" y2="60.5" stroke="currentColor" strokeOpacity={0.05} strokeWidth={0.5} className="text-foreground" />
             </svg>
 
-            <div className="relative w-full h-full flex items-end justify-between pb-2 px-4 md:px-8">
+            <div className="relative w-full h-full flex items-center justify-between px-4 md:px-8">
               
-              {/* Logo - Left Side */}
-              {/* <div className="flex items-center mb-1 shrink-0">
-                {logo || (
-                  <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-8 h-8 bg-foreground rounded-xl flex items-center justify-center">
-                      <span className="text-background font-bold text-xl">E</span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-lg tracking-tight">EURO</span>
-                      <span className="font-medium text-foreground/70">ENTERPRISES</span>
-                    </div>
-                  </Link>
-                )}
-              </div> */}
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-3 group mb-4 mr-4">
+                <Image
+                  src="/logo.png"
+                  alt="EURO ENTERPRISES"
+                  width={80}
+                  height={60}
+                  className="object-contain"
+                  priority
+                />
+              </Link>
 
-              {/* Desktop Navigation - Right Side */}
-              <nav className="hidden md:flex items-center gap-8 mb-1">
-               
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center gap-8">
                 {navItems.map(item => (
                   <NavLink key={item.label} {...item} />
                 ))}
-                                <ModeToggle />
-
+                <ModeToggle />
               </nav>
-
-              {/* Desktop Auth + Theme */}
-              <div className="hidden md:flex items-center gap-4 mb-1">
-                {/* <Link 
-                  href="/login" 
-                  className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-                >
-                  Log in
-                </Link> */}
-                {/* <Link 
-                  href="/signup" 
-                  className="px-4 py-2 text-sm font-medium bg-foreground text-background rounded-2xl hover:bg-foreground/90 transition-colors shadow-sm"
-                >
-                  Sign up
-                </Link> */}
-              </div>
 
               {/* Mobile Menu Button */}
               <button 
-                className="md:hidden mb-1 p-2 text-foreground/70 hover:text-foreground transition-colors"
+                className="md:hidden p-2 text-foreground/70 hover:text-foreground transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
               >

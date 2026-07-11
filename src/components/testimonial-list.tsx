@@ -16,6 +16,7 @@ import {
 } from "@/components/testimonial"
 
 export type TestimonialType = {
+  id: string,
   /** URL to the person's profile picture or avatar image */
   authorAvatar: string
   /** Full display name of the person giving the testimonial */
