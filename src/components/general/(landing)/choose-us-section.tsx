@@ -108,7 +108,7 @@ export default function WhyChooseUs() {
             <TabsList className="bg-muted/70 backdrop-blur-sm flex h-auto flex-col rounded-3xl p-3 shadow-inner w-72 shrink-0">
               {features.map(({ icon: Icon, name, value }) => (
                 <Tooltip key={value}>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <TabsTrigger
                       value={value}
                       className="group flex h-14 w-full items-center gap-4 rounded-2xl px-5 text-left transition-all hover:bg-background/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-xl border-0 relative overflow-hidden"
