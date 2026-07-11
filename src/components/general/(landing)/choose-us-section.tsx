@@ -82,7 +82,7 @@ export default function WhyChooseUs() {
         <WhyChooseUsHeader />
 
         <Tabs defaultValue="inspection" className="w-full">
-          {/* ==================== MOBILE TABS - CLEAN & AMAZING ==================== */}
+          {/* ==================== MOBILE TABS ==================== */}
           <div className="lg:hidden mb-10">
             <TabsList className="bg-transparent flex w-full gap-3 px-1">
               {features.slice(0, 3).map(({ icon: Icon, name, value }) => (
@@ -103,15 +103,15 @@ export default function WhyChooseUs() {
             </p>
           </div>
 
-          {/* ==================== DESKTOP TABS (Vertical) ==================== */}
+          {/* ==================== DESKTOP TABS (Vertical - No Line) ==================== */}
           <div className="hidden lg:flex gap-12 items-start">
             <TabsList className="bg-muted/70 backdrop-blur-sm flex h-auto flex-col rounded-3xl p-3 shadow-inner w-72 shrink-0">
               {features.map(({ icon: Icon, name, value }) => (
-                <Tooltip key={value} delayDuration={0}>
+                <Tooltip key={value}>
                   <TooltipTrigger asChild>
                     <TabsTrigger
                       value={value}
-                      className="group flex h-14 w-full items-center gap-4 rounded-2xl px-5 text-left transition-all hover:bg-background/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-xl border-0"
+                      className="group flex h-14 w-full items-center gap-4 rounded-2xl px-5 text-left transition-all hover:bg-background/80 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-xl border-0 relative overflow-hidden"
                     >
                       <Icon className="h-6 w-6" />
                       <span className="font-medium">{name}</span>
