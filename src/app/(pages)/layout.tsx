@@ -4,6 +4,7 @@ import "../globals.css";
 import { ThemeProvider } from "@/components/general/(themes)/theme-provider";
 import GradientDotMesh from "@/components/pixel-perfect/gradient-dot-mesh";
 import Footer from "@/components/general/(common)/footer";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +43,10 @@ export default function RootLayout({
         >
           {/* Main Content */}
           <main className="flex-1 relative z-10">
+            <TooltipProvider>
             {children}
+
+            </TooltipProvider>
           </main>
         </ThemeProvider>
         <Footer/>

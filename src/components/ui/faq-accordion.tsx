@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import FaqHeader from "../general/(landing)/faq-header";
 
 export interface FaqItem {
   question: string;
@@ -13,12 +14,58 @@ export interface FaqAccordionProps extends React.HTMLAttributes<HTMLDivElement> 
   title?: string;
 }
 
+
 const DEFAULT_ITEMS: FaqItem[] = [
-  { question: "What is Vengeance UI?", answer: "Vengeance UI is a high-performance, dark-mode first component library designed for the next generation of web applications." },
-  { question: "Can I use it with Tailwind CSS?", answer: "Yes! All components are built on top of Tailwind CSS and highly customizable using utility classes." },
-  { question: "Are the components accessible?", answer: "Accessibility is a core focus. We ensure proper ARIA attributes, keyboard navigation, and semantic HTML structure." },
-  { question: "Do I need to install a heavy npm package?", answer: "No. Vengeance UI provides a CLI that lets you copy and paste only the components you need directly into your project." },
-  { question: "Is it compatible with React and Next.js?", answer: "Absolutely. The library is built with React in mind and perfectly supports Next.js Server Components and client-side rendering." },
+  {
+    question: "How do I book a rental car?",
+    answer:
+      "Booking is quick and simple. Browse our available vehicles, choose your preferred pickup and return dates, and submit your reservation. Our team will confirm your booking shortly."
+  },
+  {
+    question: "What documents are required to rent a vehicle?",
+    answer:
+      "You'll need a valid driver's license, a government-issued ID or passport, and any additional documents requested based on your booking or location."
+  },
+  {
+    question: "Is there a minimum age requirement?",
+    answer:
+      "Yes. Drivers must generally be at least 21 years old with a valid driver's license. Some premium or luxury vehicles may require a higher minimum age."
+  },
+  {
+    question: "Can I extend my rental period?",
+    answer:
+      "Absolutely. Contact our support team before your scheduled return time. We'll extend your rental if the vehicle is available."
+  },
+  {
+    question: "Are your vehicles insured?",
+    answer:
+      "Yes. All of our rental vehicles include standard insurance coverage. Additional protection plans may also be available depending on your rental package."
+  },
+  {
+    question: "What happens if I return the car late?",
+    answer:
+      "Late returns may result in additional rental charges. If you expect a delay, simply contact our team as soon as possible so we can assist you."
+  },
+  {
+    question: "Can I cancel my reservation?",
+    answer:
+      "Yes. Reservations can be cancelled according to our cancellation policy. Please contact our customer support for assistance with changes or cancellations."
+  },
+  {
+    question: "Do you offer airport pickup and drop-off?",
+    answer:
+      "Yes. We provide convenient airport pickup and drop-off services for selected locations. Simply mention your flight details during booking."
+  },
+  {
+    question: "Do you provide a chauffeur service?",
+    answer:
+      "Yes. In addition to self-drive rentals, we also offer professional chauffeur services for business trips, weddings, airport transfers, and special events."
+  },
+  {
+    question: "How can I contact Euro Enterprises?",
+    answer:
+      "You can reach us through WhatsApp, phone, or our online contact form. Our support team is ready to help you with bookings, inquiries, and roadside assistance."
+  }
 ];
 
 export function FaqAccordion({
@@ -35,6 +82,7 @@ export function FaqAccordion({
 
   return (
     <div className={cn("w-full max-w-3xl mx-auto py-8 relative font-sans", className)} {...props}>
+      <FaqHeader/>
       {title && (
         <h2 className="text-center font-bold text-2xl md:text-3xl mb-10 text-neutral-500 dark:text-neutral-400">
           {title}
