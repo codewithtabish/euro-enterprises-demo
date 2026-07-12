@@ -31,7 +31,7 @@ const features = [
     icon: ShieldCheck,
     title: "100+ Point Vehicle Inspection",
     content:
-      "Every vehicle is carefully inspected by certified technicians before being added to our fleet. We thoroughly inspect the engine, brakes, suspension, steering, tires, electronics, safety systems, and overall condition to ensure maximum reliability and customer confidence.",
+      "Every vehicle is carefully inspected by certified technicians before being added to our fleet. We thoroughly inspect the engine, brakes..",
   },
   {
     name: "Fleet",
@@ -39,7 +39,7 @@ const features = [
     icon: CarFront,
     title: "Premium Vehicle Fleet",
     content:
-      "Choose from our wide collection of luxury sedans, SUVs, economy cars, and executive vehicles. Every vehicle is professionally cleaned, serviced, and maintained to the highest standards before every rental.",
+      "Choose from our wide collection of luxury sedans, SUVs, economy cars, and executive vehicles..",
   },
   {
     name: "Pricing",
@@ -47,7 +47,7 @@ const features = [
     icon: BadgeDollarSign,
     title: "Transparent Pricing",
     content:
-      "Enjoy straightforward pricing with no hidden charges. Our flexible rental plans provide exceptional value while maintaining complete transparency from booking to vehicle return.",
+      "Enjoy straightforward pricing with no hidden charges. Our flexible rental plans provide exceptional value ..",
   },
   {
     name: "Support",
@@ -55,7 +55,7 @@ const features = [
     icon: Headset,
     title: "24/7 Customer Support",
     content:
-      "Our dedicated support team is always available to assist you before, during, and after your rental. We are committed to providing a smooth and stress-free experience.",
+      "Our dedicated support team is always available to assist you before, during, and after your rental. .",
   },
   {
     name: "Quality",
@@ -63,7 +63,7 @@ const features = [
     icon: ClipboardCheck,
     title: "Guaranteed Quality",
     content:
-      "Every vehicle undergoes professional detailing, sanitization, and final quality checks before delivery, ensuring a clean, comfortable, and dependable driving experience.",
+      "Every vehicle undergoes professional detailing, sanitization, and final quality checks before delivery.",
   },
   {
     name: "Booking",
@@ -71,11 +71,11 @@ const features = [
     icon: Clock3,
     title: "Fast & Easy Booking",
     content:
-      "Reserve your preferred vehicle in just a few minutes through our streamlined booking process. Quick confirmation, simple paperwork, and hassle-free pickup.",
+      "Reserve your preferred vehicle in just a few minutes ..",
   },
 ];
 
-export default function WhyChooseUs() {
+export default function WhyChooseUsSection() {
   return (
     <section className="py-16 md:py-20 bg-background">
       <div className="container mx-auto px-6 max-w-7xl">

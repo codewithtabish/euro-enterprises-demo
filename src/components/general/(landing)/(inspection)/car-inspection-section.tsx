@@ -104,7 +104,7 @@ const features = [
   },
 ];
 
-export function CarInspectionDemoSection() {
+export function CarInspectionSection() {
   return (
     <section className="py-24">
       <div className="container mx-auto px-4">

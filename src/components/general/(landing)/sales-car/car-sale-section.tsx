@@ -7,8 +7,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { div } from "framer-motion/client";
-import CarsForSaleHeader from "../general/(landing)/sales-header";
+import CarsForSaleHeader from "./sales-header";
 const FEATURED_CARS = [
   { 
     id: 1, 
@@ -58,7 +57,7 @@ src: "/features/nine.jpg"   },
   
 ];
 
-const AccordionCarousel = () => {
+const CarSalesSection = () => {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -148,4 +147,4 @@ const AccordionCarousel = () => {
   );
 };
 
-export default AccordionCarousel;
+export default CarSalesSection;

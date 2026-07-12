@@ -13,7 +13,7 @@ import {
   TestimonialAvatarImg,
   TestimonialAvatarRing,
   TestimonialQuote,
-} from "@/components/testimonial"
+} from "@/components/general/(landing)/(testmonial)/testimonial"
 
 export type TestimonialType = {
   id: string,

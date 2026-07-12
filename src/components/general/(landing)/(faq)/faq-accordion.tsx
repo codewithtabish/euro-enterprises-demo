@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import FaqHeader from "../general/(landing)/faq-header";
+import FaqHeader from "./faq-header";
 
 export interface FaqItem {
   question: string;

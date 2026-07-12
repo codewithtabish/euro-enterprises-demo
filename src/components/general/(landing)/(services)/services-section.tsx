@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { useTheme } from "next-themes";
-import LightServices from './light-services';      // Your light version
-import ServicesGrid from './services-carasoul';
-import { div } from 'framer-motion/client';
+import DarkServices from './dark-services';
+import LightServicesSection from './light-services';
 
 const ServicesSection = () => {
   const { theme, resolvedTheme } = useTheme();
@@ -14,20 +13,20 @@ const ServicesSection = () => {
     <div>
       {currentTheme === 'light' ? (
         <div>
-          <section >
+          < >
             <div className='md:block hidden'>
-              <LightServices/>
+              <LightServicesSection/>
 
             </div>
             <div className='block md:hidden'>
-              <ServicesGrid/>
+              <DarkServices/>
 
             </div>
 
-          </section>
+          </>
         </div>
       ) : (
-        <ServicesGrid />
+        <DarkServices />
       )}
     </div>
   );

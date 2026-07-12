@@ -7,13 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import ServicesHeader from "./services-header";
 
-type Service = {
-  title: string;
-  tag: string;
-  description: string;
-  longDesc: string;
-  icon: React.ReactNode;
-};
+
 
 const SERVICES = [
   {
@@ -77,7 +71,7 @@ const Arrow = () => (
   </svg>
 );
 
-export default function ServicesGrid() {
+export default function DarkServices() {
   return (
     <div className="w-full py-10 md:py-20">
       <div className="max-w-7xl mx-auto px-6">
@@ -97,7 +91,7 @@ export default function ServicesGrid() {
             <div key={i} className="relative group">
               <div
                 className={cn(
-                  "relative md:h-[360px] h-[280px] flex flex-col justify-center items-center p-4 text-left overflow-hidden rounded-3xl",
+                  "relative md:h-[340px]  h-[280px] flex flex-col justify-center items-center p-4 text-left overflow-hidden rounded-3xl",
                   "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800",
                   "transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
                 )}
@@ -125,7 +119,7 @@ export default function ServicesGrid() {
 
                 {/* Bottom Right Arrow */}
                 <div className="absolute bottom-9 md:block hidden right-9 h-10 w-28 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 group-hover:border-amber-500/30 transition-colors">
-                  <Arrow />
+                  {/* <Arrow /> */}
                 </div>
               </div>
             </div>

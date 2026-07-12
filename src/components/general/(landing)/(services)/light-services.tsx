@@ -28,7 +28,7 @@ const SERVICES_DATA: ServiceItem[] = [
     icon: <Car className="w-8 h-8" />,
     description: "World-Class Luxury Vehicles",
     longDesc: "Handpicked collection of Mercedes S-Class, Rolls-Royce, Bentley, Ferrari, and Range Rover — impeccably maintained.",
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=85",
+    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&q=90",
   },
   {
     id: 2,
@@ -36,7 +36,7 @@ const SERVICES_DATA: ServiceItem[] = [
     icon: <Users className="w-8 h-8" />,
     description: "Professional Private Drivers",
     longDesc: "Discreet, highly trained chauffeurs delivering 5-star service with deep local knowledge.",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=85",
+    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=90",
   },
   {
     id: 3,
@@ -44,7 +44,7 @@ const SERVICES_DATA: ServiceItem[] = [
     icon: <Calendar className="w-8 h-8" />,
     description: "Unforgettable Celebrations",
     longDesc: "Make your special day extraordinary with elegant processions and luxury transportation.",
-    image: "https://images.unsplash.com/photo-1519741497674-611027288377?w=1200&q=85",
+    image: "https://images.unsplash.com/photo-1519741497674-611027288377?w=1200&q=90",
   },
   {
     id: 4,
@@ -52,11 +52,11 @@ const SERVICES_DATA: ServiceItem[] = [
     icon: <Shield className="w-8 h-8" />,
     description: "Secure Luxury Transport",
     longDesc: "Armored vehicles and professional security for high-profile clients and dignitaries.",
-    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1200&q=85",
+    image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1200&q=90",
   },
 ];
 
-export default function ServicesSection() {
+export default function LightServicesSection() {
   const [activeImage, setActiveImage] = useState(SERVICES_DATA[0].image);
   const [activeId, setActiveId] = useState(1);
 
@@ -108,7 +108,7 @@ export default function ServicesSection() {
 
           {/* Image Preview */}
           <div className="hidden lg:block w-full lg:w-7/12 relative">
-            <div className="sticky top-24 rounded-3xl overflow-hidden shadow-2xl aspect-16/10 bg-zinc-900">
+            <div className="sticky top-24 rounded-3xl overflow-hidden shadow-2xl aspect-[16/10] bg-zinc-900">
               {SERVICES_DATA.map((service) => (
                 <Image
                   key={service.id}
@@ -120,13 +120,13 @@ export default function ServicesSection() {
                     activeImage === service.image ? "opacity-100" : "opacity-0"
                   )}
                   priority={service.id === 1}
-                  quality={85}
+                  quality={90}           // Changed to 90 (allowed by default)
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               ))}
 
               {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               
               {/* Active Label */}
               <div className="absolute bottom-8 left-8 text-white">

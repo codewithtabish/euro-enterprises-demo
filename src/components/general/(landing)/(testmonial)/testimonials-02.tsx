@@ -1,7 +1,7 @@
 "use client";
 
-import type { TestimonialType } from "@/components/testimonial-list";
-import { TestimonialList } from "@/components/testimonial-list";
+import type { TestimonialType } from "@/components/general/(landing)/(testmonial)/testimonial-list";
+import { TestimonialList } from "@/components/general/(landing)/(testmonial)/testimonial-list";
 
 export default function TestimonialsSection() {
   return (

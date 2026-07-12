@@ -3,12 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import GradientDotMesh from "@/components/pixel-perfect/gradient-dot-mesh";
 
 const Footer = () => {
   return (
     <footer className="relative overflow-hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-      <GradientDotMesh />
+      {/* <GradientDotMesh /> */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12">
@@ -17,14 +16,15 @@ const Footer = () => {
           <div className="lg:col-span-5 space-y-6">
             <div className="flex items-center gap-3">
               <Image
-                src="/logo.png"
-                alt="EURO ENTERPRISES"
-                width={180}
-                height={60}
-                className="object-contain h-15 w-auto"   // ← Fixed
-                style={{ height: "60px", width: "auto" }}     // ← Extra safety
-                priority
-              />
+  src="/logo.png"
+  alt="EURO ENTERPRISES"
+  width={386}
+  height={386}
+  style={{ height: "48px", width: "auto" }}   // Change 48px as needed
+  className="object-contain"
+  priority
+/>
+
             </div>
 
             <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-md leading-relaxed">
