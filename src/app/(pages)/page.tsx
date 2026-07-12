@@ -1,3 +1,4 @@
+import FeaturedCarsSection from '@/components/general/(landing)/(fearuredcars)/featured-cars-section'
 import HeroSection from '@/components/general/(landing)/(hero)/hero-section'
 import APPNavBar from '@/components/general/(landing)/(navbar)/navbar'
 import ServicesSection from '@/components/general/(landing)/services-check'
@@ -18,11 +19,11 @@ const HomePage = () => {
         <APPNavBar/>
         <HeroSection/>
         <ServicesSection/>
+        <FeaturedCarsSection/>
      
 
 
 {/*       
-      <FeaturedCarsSection/>
       <AccordionCarousel/>
       <CarInspectionDemoSection/>
       <WhyChooseUsTabs/>

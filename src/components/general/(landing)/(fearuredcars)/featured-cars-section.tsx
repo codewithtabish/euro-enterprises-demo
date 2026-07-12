@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
-import FeaturedRentalCarsHeader from "../general/(landing)/featured-header";
+import FeaturedRentalCarsHeader from "./featured-header";
 
 const COVERS = [
   { seed: "midnight-drive", title: "Midnight Drive", src: "/features/one.jpg" },
@@ -118,7 +118,7 @@ const FeaturedCarsSection = () => {
   };
 
   return (
-    <div className="pt-20">
+    <div className="pt-10 md:pt-20">
       <FeaturedRentalCarsHeader/>
     <div
       data-coverflow
