@@ -30,7 +30,7 @@ const members = [
     {
         name: 'Raja Khan',
         role: 'Sales Manager',
-        avatar: '/team/raja1.jpg',
+        avatar: '/team/raja2.jpg',
         link: '#',
     },
     {
