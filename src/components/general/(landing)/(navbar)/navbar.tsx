@@ -80,7 +80,7 @@ const APPNavBar = () => {
                         {/* Right - Actions */}
                         <div className="flex items-center flex-row-reverse md:flex-row shrink-0">
                             <ModeToggle />
-                            <Button className={'md:p-5 p-3 cursor-pointer rounded-xl md:block hidden'}  >
+                            <Button className={'  cursor-pointer rounded-xl md:block hidden'}  >
                                LOGIN
                             </Button>
                         </div>
