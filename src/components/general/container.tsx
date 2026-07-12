@@ -1,7 +1,6 @@
 // components/general/container.tsx
 
 import { cn } from "@/lib/utils";
-import GradientDotMesh from "../pixel-perfect/gradient-dot-mesh";
 
 export function Container({
   children,
