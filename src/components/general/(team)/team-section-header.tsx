@@ -15,7 +15,7 @@ export default function TeamHeader() {
       <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-zinc-900 dark:text-white relative inline-block">
         Our Dream Team
         {/* Elegant Underline */}
-        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 h-[3px] w-28 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 h-[3px] w-28 bg-linear-to-r from-transparent via-amber-500 to-transparent" />
       </h2>
 
       <p className="mt-6 text-zinc-600 dark:text-zinc-400 max-w-md mx-auto text-lg">

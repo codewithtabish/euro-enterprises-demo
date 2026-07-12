@@ -6,7 +6,7 @@ const members = [
     {
         name: 'Muhammad Ali',
         role: 'Head of Rentals',
-        avatar: '/team/ali.jpg',
+        avatar: '/team/alii.jpg',
         link: '#',
     },
     {
