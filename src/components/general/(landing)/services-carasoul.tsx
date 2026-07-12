@@ -5,7 +5,6 @@ import {
   Car, Users, Calendar, Shield, Clock, Award 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import GradientDotMesh from "@/components/pixel-perfect/gradient-dot-mesh";
 import ServicesHeader from "./services-header";
 
 type Service = {
@@ -95,11 +94,10 @@ export default function ServicesGrid() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {SERVICES.map((service, i) => (
-            <div key={i} className="relative group ">
-            {/* <GradientDotMesh/> */}
+            <div key={i} className="relative group">
               <div
-              className={cn(
-                  "relative h-[360px] flex flex-col justify-center items-center p-4 text-left overflow-hidden rounded-3xl",
+                className={cn(
+                  "relative md:h-[360px] h-[280px] flex flex-col justify-center items-center p-4 text-left overflow-hidden rounded-3xl",
                   "bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800",
                   "transition-all duration-500 hover:shadow-2xl hover:-translate-y-1"
                 )}
@@ -107,33 +105,26 @@ export default function ServicesGrid() {
               >
                 {/* Top Content */}
                 <div className="flex-1">
-              
+                  <div className="text-center flex flex-col items-center">
+                    {/* Title */}
+                    <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white mb-3 md:mb-4 text-balance">
+                      {service.title}
+                    </h3>
 
-                <div className="text-center flex flex-col items-center">
-  {/* Icon */}
-  {/* <div className="text-amber-600 dark:text-white mb-6 md:mb-8 transition-colors">
-    {service.icon}
-  </div> */}
+                    {/* Short Description */}
+                    <p className="text-base sm:text-lg text-zinc-700 dark:text-zinc-300 mb-4 md:mb-6 font-medium text-balance">
+                      {service.description}
+                    </p>
 
-  {/* Title */}
-  <h3 className="text-3xl sm:text-4xl  font-bold tracking-tight text-zinc-900 dark:text-white mb-3 md:mb-4 text-balance">
-    {service.title}
-  </h3>
-
-  {/* Short Description */}
-  <p className="text-base sm:text-lg text-zinc-700 dark:text-zinc-300 mb-4 md:mb-6 font-medium text-balance">
-    {service.description}
-  </p>
-
-  {/* Long Description */}
-  <p className="text-sm sm:text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 max-w-[260px] text-balance">
-    {service.longDesc}
-  </p>
-</div>
+                    {/* Long Description */}
+                    <p className="text-sm sm:text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 max-w-[260px] text-balance">
+                      {service.longDesc}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Bottom Right Arrow */}
-                <div className="absolute bottom-9 right-9 flex h-16 w-28 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 group-hover:border-amber-500/30 transition-colors">
+                <div className="absolute bottom-9 md:block hidden right-9 h-10 w-28 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 group-hover:border-amber-500/30 transition-colors">
                   <Arrow />
                 </div>
               </div>
