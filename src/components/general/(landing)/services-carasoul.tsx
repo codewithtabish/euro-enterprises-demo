@@ -80,7 +80,7 @@ const Arrow = () => (
 
 export default function ServicesGrid() {
   return (
-    <div className="w-full py-20">
+    <div className="w-full py-10 md:py-20">
       <div className="max-w-7xl mx-auto px-6">
         <ServicesHeader/>
 

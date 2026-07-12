@@ -31,7 +31,7 @@ const stripVariants = (s: number) => ({
   }),
 });
 
-const SlicedRevealCarousel = () => {
+const DesktopHeroSection = () => {
   const [[index, dir], setState] = useState<[number, number]>([0, 1]);
 
   const paginate = useCallback((d: number) => {
@@ -136,4 +136,4 @@ const SlicedRevealCarousel = () => {
   );
 };
 
-export default SlicedRevealCarousel;
+export default DesktopHeroSection;

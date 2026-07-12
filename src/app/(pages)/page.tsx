@@ -1,8 +1,11 @@
 import { CallToAction } from '@/components/cta'
+import HeroSection from '@/components/general/(landing)/(hero)/hero-section'
+import APPNavBar from '@/components/general/(landing)/(navbar)/navbar'
 import { CarInspectionDemoSection } from '@/components/general/(landing)/car-inspection-demo'
 import WhyChooseUsTabs from '@/components/general/(landing)/choose-us-section'
 import ServicesSection from '@/components/general/(landing)/services-check'
 import { Container } from '@/components/general/container'
+import { Hero47 } from '@/components/hero47'
 import AccordionCarousel from '@/components/pixel-perfect/accordion-carousel'
 import FeaturedCarsSection from '@/components/pixel-perfect/cover-flow-carousel'
 import SlicedRevealCarousel from '@/components/pixel-perfect/sliced-reveal-carousel'
@@ -14,28 +17,29 @@ import React from 'react'
 
 
 
+
+
 const HomePage = () => {
   return (
     <div>
       {/* <GradientDotMesh /> */}
       
-
-
+  
       <Container>
-     <NotchNavbar/>
+        <APPNavBar/>
+        <HeroSection/>
+        <ServicesSection/>
      
 
 
-      
-      <SlicedRevealCarousel/>
-      <ServicesSection/>
+{/*       
       <FeaturedCarsSection/>
       <AccordionCarousel/>
       <CarInspectionDemoSection/>
       <WhyChooseUsTabs/>
       <TestimonialsSection/>
       <FaqAccordion/>
-      <CallToAction/>
+      <CallToAction/> */}
       
  
 
