@@ -9,7 +9,6 @@ import { ModeToggle } from '../../(themes)/theme-toggler';
 import {
   Show,
   SignInButton,
-  SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
 
@@ -31,7 +30,7 @@ const APPNavBar = () => {
   const [carsOpen, setCarsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full">
+    <header className="sticky top-0 z-50 w-full ">
       <nav
         data-state={menuState ? 'active' : undefined}
         className="border-b border-border bg-white/95 backdrop-blur-lg dark:bg-zinc-950/95 transition-all duration-300"
@@ -70,6 +69,7 @@ const APPNavBar = () => {
                     </Link>
                   )}
 
+
                   {/* Cars Dropdown */}
                   {item.hasDropdown && carsOpen && (
                     <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 rounded-2xl bg-white dark:bg-zinc-900 border border-border shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -90,6 +90,9 @@ const APPNavBar = () => {
                   )}
                 </div>
               ))}
+
+          
+
             </div>
 
             {/* Right Side Actions */}
@@ -99,12 +102,13 @@ const APPNavBar = () => {
               {/* Desktop Auth */}
               <div className="hidden lg:flex items-center gap-3">
                 <Show when="signed-out">
-                  <SignInButton
-                    mode="modal"
-                  >
-                    <Button variant="outline" size="sm" className="font-medium">
-                      Log in
-                    </Button>
+                  <SignInButton mode="modal">
+                       <Button className={'md:px-5 px-4 md:py-6 py-4 cursor-pointer'} variant={'secondary'}>
+                Get Started
+              </Button>
+              {/* <GooeyButton  /> */}
+
+              
                   </SignInButton>
                 </Show>
 
@@ -119,12 +123,10 @@ const APPNavBar = () => {
                 </Show>
               </div>
 
-              {/* Mobile Auth */}
+              {/* Mobile Auth - Only Login Button (Small Badge Style) */}
               <div className="lg:hidden">
                 <Show when="signed-out">
-                  <SignInButton
-                    mode="modal"
-                  >
+                  <SignInButton mode="modal">
                     <Button variant="outline" size="icon" className="h-9 w-9">
                       <span className="text-xs font-medium">Log in</span>
                     </Button>
@@ -155,9 +157,9 @@ const APPNavBar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - NO Auth Buttons */}
         <div
-          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6 py-8 shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
+          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6  shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
         >
           <ul className="space-y-6 text-base font-medium">
             {menuItems.map((item, index) => (
@@ -190,23 +192,6 @@ const APPNavBar = () => {
               </li>
             ))}
           </ul>
-
-          {/* Mobile Auth Buttons */}
-          <Show when="signed-out">
-            <div className="mt-8 flex flex-col gap-3">
-              <SignInButton
-                mode="modal"
-              >
-                <Button className="w-full font-medium">Log in</Button>
-              </SignInButton>
-
-              <SignUpButton
-                mode="modal"
-              >
-                <Button variant="outline" className="w-full font-medium">Get Started</Button>
-              </SignUpButton>
-            </div>
-          </Show>
         </div>
       </nav>
     </header>
