@@ -11,6 +11,7 @@ import {
   SignInButton,
   UserButton,
 } from "@clerk/nextjs";
+import Image from 'next/image';
 
 const menuItems = [
   { name: 'Cars', href: '#', hasDropdown: true },
@@ -37,12 +38,19 @@ const APPNavBar = () => {
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
+            <Link href={'/'}>
+                        <Image
+            src="/logo2.png"
+            alt="EURO ENTERPRISES"
+            width={386}
+            height={386}
+            style={{ height: "48px", width: "auto" }}   // Change 48px as needed
+            className="object-contain"
+            priority
+            />
+            </Link>
             {/* Logo */}
-            <div className="shrink-0">
-              <Link href="/" className="flex items-center gap-2">
-                <Logo />
-              </Link>
-            </div>
+            
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center justify-center flex-1 gap-10">
