@@ -1,7 +1,6 @@
 import FeaturedCarsSection from '@/components/general/(landing)/(fearuredcars)/featured-cars-section'
 import HeroSection from '@/components/general/(landing)/(hero)/hero-section'
 import { CarInspectionSection } from '@/components/general/(landing)/(inspection)/car-inspection-section'
-import APPNavBar from '@/components/general/(landing)/(navbar)/navbar'
 import ServicesSection from '@/components/general/(landing)/(services)/services-section'
 import TestimonialsSection from '@/components/general/(landing)/(testmonial)/testimonials-02'
 import WhyChooseUsSection from '@/components/general/(landing)/(why-choose)/choose-us-section'
