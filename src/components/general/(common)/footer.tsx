@@ -5,8 +5,12 @@ import Link from "next/link";
 import Image from "next/image";
 
 const Footer = () => {
+ 
+    
+
+
   return (
-    <footer className="relative overflow-hidden border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+    <footer className={'relative overflow-hidden border-t  border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950'}>
       {/* <GradientDotMesh /> */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
@@ -62,7 +66,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <h4 className="font-semibold text-lg mb-6 text-zinc-900 dark:text-white">Legal</h4>
             <ul className="space-y-4 text-zinc-600 dark:text-zinc-400">
-              <li><Link href="/privacy" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
@@ -85,3 +89,7 @@ const Footer = () => {
 };
 
 export default Footer;
+
+
+
+

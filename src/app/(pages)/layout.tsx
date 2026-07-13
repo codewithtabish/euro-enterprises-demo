@@ -53,8 +53,8 @@ export default function RootLayout({
               <APPNavBar/>
               {children}
             </main>
-
             <Footer />
+
           </TooltipProvider>
         </ThemeProvider>
           </ClerkProvider>

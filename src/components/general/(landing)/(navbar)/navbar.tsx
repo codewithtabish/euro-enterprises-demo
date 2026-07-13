@@ -18,7 +18,7 @@ const menuItems = [
   { name: 'Blogs', href: '/blogs' },
   { name: 'Teams', href: '/teams' },
   { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
+  { name: 'Contact', href: '/contact-us' },
 ];
 
 const carSubmenu = [
