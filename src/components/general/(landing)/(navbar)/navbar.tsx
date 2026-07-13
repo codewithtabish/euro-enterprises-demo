@@ -1,139 +1,216 @@
-'use client'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import React, { useState } from 'react'
-import { Menu, X, ChevronDown } from 'lucide-react'
-import { Logo } from '@/components/logo'
-import { ModeToggle } from '../../(themes)/theme-toggler'
+'use client';
+
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+import { Logo } from '@/components/logo';
+import { ModeToggle } from '../../(themes)/theme-toggler';
+import {
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 const menuItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Cars', href: '#', hasDropdown: true },
-    { name: 'Blogs', href: '/blogs' },
-    { name: 'Teams', href: '/teams' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
-]
+  { name: 'Cars', href: '#', hasDropdown: true },
+  { name: 'Blogs', href: '/blogs' },
+  { name: 'Teams', href: '/teams' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
+];
 
 const carSubmenu = [
-    { name: 'Rentals', href: '#rentals' },
-    { name: 'Sales', href: '#sales' },
-]
+  { name: 'Rentals', href: '/cars/rental' },
+  { name: 'Sales', href: '/cars/sales' },
+];
 
 const APPNavBar = () => {
-    const [menuState, setMenuState] = useState(false)
-    const [carsOpen, setCarsOpen] = useState(false)
+  const [menuState, setMenuState] = useState(false);
+  const [carsOpen, setCarsOpen] = useState(false);
 
-    return (
-        <header>
-            <nav
-                data-state={menuState && 'active'}
-                className="fixed z-50 w-full border-b border-dashed bg-white/95 backdrop-blur-md md:relative dark:bg-zinc-950/95 lg:dark:bg-transparent">
-                <div className="mx-auto max-w-7xl px-6">
-                    <div className="flex items-center justify-between gap-6 py-2 lg:py-3">
-                        {/* Left - Logo */}
-                        <div className="shrink-0">
-                            <Link href="/" className="flex items-center">
-                                <Logo />
-                            </Link>
-                        </div>
+  return (
+    <header className="sticky top-0 z-50 w-full">
+      <nav
+        data-state={menuState ? 'active' : undefined}
+        className="border-b border-border bg-white/95 backdrop-blur-lg dark:bg-zinc-950/95 transition-all duration-300"
+      >
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
+            {/* Logo */}
+            <div className="shrink-0">
+              <Link href="/" className="flex items-center gap-2">
+                <Logo />
+              </Link>
+            </div>
 
-                        {/* Center - Desktop Navigation */}
-                        <div className="hidden lg:flex items-center justify-center flex-1 gap-8">
-                            {menuItems.map((item, index) => (
-                                <div key={index} className="relative group">
-                                    {item.hasDropdown ? (
-                                        <div
-                                            className="flex items-center gap-1 text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer py-2"
-                                            onClick={() => setCarsOpen(!carsOpen)}
-                                        >
-                                            {item.name}
-                                            <ChevronDown className={`size-4 transition-transform ${carsOpen ? 'rotate-180' : ''}`} />
-                                        </div>
-                                    ) : (
-                                        <Link
-                                            href={item.href}
-                                            className="text-muted-foreground hover:text-foreground font-medium transition-colors py-2">
-                                            {item.name}
-                                        </Link>
-                                    )}
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center justify-center flex-1 gap-10">
+              {menuItems.map((item, index) => (
+                <div key={index} className="relative group">
+                  {item.hasDropdown ? (
+                    <button
+                      type="button"
+                      onClick={() => setCarsOpen(!carsOpen)}
+                      className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 focus:outline-none"
+                      aria-expanded={carsOpen}
+                    >
+                      {item.name}
+                      <ChevronDown
+                        className={`size-4 transition-transform duration-200 ${carsOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
+                    >
+                      {item.name}
+                    </Link>
+                  )}
 
-                                    {/* Cars Dropdown */}
-                                    {item.hasDropdown && carsOpen && (
-                                        <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-48 rounded-xl bg-white dark:bg-zinc-900 border shadow-xl py-2 z-50">
-                                            {carSubmenu.map((sub, subIndex) => (
-                                                <Link
-                                                    key={subIndex}
-                                                    href={sub.href}
-                                                    className="block px-6 py-3 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                                                    onClick={() => setCarsOpen(false)}
-                                                >
-                                                    {sub.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Right - Actions */}
-                        <div className="flex items-center flex-row-reverse md:flex-row shrink-0">
-                            <ModeToggle />
-                            <Button className={'  cursor-pointer rounded-xl md:block hidden'}  >
-                               LOGIN
-                            </Button>
-                        </div>
-
-                        {/* Mobile Menu Button */}
-                        <button
-                            onClick={() => setMenuState(!menuState)}
-                            aria-label={menuState ? 'Close Menu' : 'Open Menu'}
-                            className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden">
-                            <Menu className="in-data-[state=active]:rotate-180 in-data-[state=active]:scale-0 in-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
-                            <X className="in-data-[state=active]:rotate-0 in-data-[state=active]:scale-100 in-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
-                        </button>
+                  {/* Cars Dropdown */}
+                  {item.hasDropdown && carsOpen && (
+                    <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 rounded-2xl bg-white dark:bg-zinc-900 border border-border shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {carSubmenu.map((sub, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          href={sub.href}
+                          className="block px-6 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl mx-2 transition-all"
+                          onClick={() => {
+                            setCarsOpen(false);
+                            setMenuState(false);
+                          }}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
                     </div>
+                  )}
                 </div>
+              ))}
+            </div>
 
-                {/* Mobile Menu */}
-                <div className="lg:hidden bg-background in-data-[state=active]:block hidden w-full border-t px-6 py-8 shadow-xl shadow-zinc-300/10 dark:shadow-none">
-                    <ul className="space-y-6 text-base">
-                        {menuItems.map((item, index) => (
-                            <li key={index}>
-                                {item.hasDropdown ? (
-                                    <>
-                                        <div className="font-medium py-2">Cars</div>
-                                        <div className="pl-6 space-y-4 mt-2">
-                                            {carSubmenu.map((sub, subIndex) => (
-                                                <Link
-                                                    key={subIndex}
-                                                    href={sub.href}
-                                                    className="block text-muted-foreground hover:text-foreground"
-                                                    onClick={() => setMenuState(false)}
-                                                >
-                                                    {sub.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <Link
-                                        href={item.href}
-                                        className="text-muted-foreground hover:text-foreground block font-medium transition-colors duration-150 py-2"
-                                        onClick={() => setMenuState(false)}
-                                    >
-                                        {item.name}
-                                    </Link>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-4">
+              <ModeToggle />
 
-                </div>
-            </nav>
-        </header>
-    )
-}
+              {/* Desktop Auth */}
+              <div className="hidden lg:flex items-center gap-3">
+                <Show when="signed-out">
+                  <SignInButton
+                    mode="modal"
+                  >
+                    <Button variant="outline" size="sm" className="font-medium">
+                      Log in
+                    </Button>
+                  </SignInButton>
+                </Show>
 
-export default APPNavBar
+                <Show when="signed-in">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-border hover:ring-primary/50 transition-all",
+                      },
+                    }}
+                  />
+                </Show>
+              </div>
+
+              {/* Mobile Auth */}
+              <div className="lg:hidden">
+                <Show when="signed-out">
+                  <SignInButton
+                    mode="modal"
+                  >
+                    <Button variant="outline" size="icon" className="h-9 w-9">
+                      <span className="text-xs font-medium">Log in</span>
+                    </Button>
+                  </SignInButton>
+                </Show>
+
+                <Show when="signed-in">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "h-9 w-9",
+                      },
+                    }}
+                  />
+                </Show>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMenuState(!menuState)}
+                aria-label={menuState ? 'Close Menu' : 'Open Menu'}
+                className="lg:hidden relative z-50 -mr-2 p-2 text-foreground hover:bg-accent rounded-xl transition-colors"
+              >
+                <Menu className={`size-6 transition-all duration-300 ${menuState ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`} />
+                <X className={`absolute inset-0 m-auto size-6 transition-all duration-300 ${menuState ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6 py-8 shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
+        >
+          <ul className="space-y-6 text-base font-medium">
+            {menuItems.map((item, index) => (
+              <li key={index} className="border-b border-border last:border-0 pb-6 last:pb-0">
+                {item.hasDropdown ? (
+                  <div>
+                    <div className="font-semibold text-foreground mb-4">Cars</div>
+                    <div className="pl-6 space-y-5">
+                      {carSubmenu.map((sub, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          href={sub.href}
+                          className="block text-muted-foreground hover:text-foreground transition-colors"
+                          onClick={() => setMenuState(false)}
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="block text-foreground hover:text-primary transition-colors py-1"
+                    onClick={() => setMenuState(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {/* Mobile Auth Buttons */}
+          <Show when="signed-out">
+            <div className="mt-8 flex flex-col gap-3">
+              <SignInButton
+                mode="modal"
+              >
+                <Button className="w-full font-medium">Log in</Button>
+              </SignInButton>
+
+              <SignUpButton
+                mode="modal"
+              >
+                <Button variant="outline" className="w-full font-medium">Get Started</Button>
+              </SignUpButton>
+            </div>
+          </Show>
+        </div>
+      </nav>
+    </header>
+  );
+};
+
+export default APPNavBar;

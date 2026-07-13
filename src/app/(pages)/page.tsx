@@ -22,7 +22,6 @@ const HomePage = () => {
       
   
       <Container>
-        <APPNavBar/>
         <HeroSection/>
         <ServicesSection/>
         <FeaturedCarsSection/>
