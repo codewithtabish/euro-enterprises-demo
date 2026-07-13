@@ -66,9 +66,11 @@ const BentoCard = ({
 
       {/* Content */}
       <div className="relative z-20 flex h-full flex-col justify-end p-8">
-        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md">
-          <Icon className="h-7 w-7 text-white" />
-        </div>
+        {/* <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md">
+          <Icon 
+          className="h-7 w-7 text-white"
+           />
+        </div> */}
 
         <h3 className="text-2xl font-bold text-white">
           {name}
