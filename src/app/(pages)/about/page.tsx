@@ -1,7 +1,7 @@
-import AboutComp from '@/components/general/(about)/about-comp'
 import BackButton from '@/components/general/(common)/back-button'
 import { Container } from '@/components/general/container'
 import React from 'react'
+import AboutEuro from './about-euro'
 
 const AboutPage = () => {
   return (
@@ -9,7 +9,8 @@ const AboutPage = () => {
         <Container>
           <BackButton className='md:pt-10 pt-5'/>
           <div className='px-5'>
-            <AboutComp/>
+            <AboutEuro/>
+
 
           </div>
         </Container>

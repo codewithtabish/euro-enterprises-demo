@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { Logo } from '@/components/logo';
 import { ModeToggle } from '../../(themes)/theme-toggler';
 import {
   Show,
@@ -12,6 +11,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import Image from 'next/image';
+import NavBarLogo from './navbar-logo';
 
 const menuItems = [
   { name: 'Cars', href: '#', hasDropdown: true },
@@ -38,18 +38,9 @@ const APPNavBar = () => {
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
-            <Link href={'/'}>
-                        <Image
-            src="/logo2.png"
-            alt="EURO ENTERPRISES"
-            width={386}
-            height={386}
-            style={{ height: "48px", width: "auto" }}   // Change 48px as needed
-            className="object-contain"
-            priority
-            />
-            </Link>
-            {/* Logo */}
+            <NavBarLogo/>
+
+ 
             
 
             {/* Desktop Navigation */}

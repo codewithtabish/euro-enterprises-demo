@@ -8,6 +8,8 @@ import CarSalesSection from '@/components/general/(landing)/sales-car/car-sale-s
 import { Container } from '@/components/general/container'
 import FaqAccordion from '@/components/general/(landing)/(faq)/faq-accordion'
 import { CallToAction } from '@/components/general/(landing)/(cta)/cta'
+import WhyChooseUsTwo from '@/components/general/(landing)/(why-choose)/why-choose-us'
+import CarsForSaleSectionTwo from '@/components/general/(landing)/sales-car/car-sale-section-two'
 
 
 
@@ -26,10 +28,16 @@ const HomePage = () => {
         <ServicesSection/>
         <FeaturedCarsSection/>
         <div className='md:block hidden'>
-          <CarSalesSection/>
+          <CarSalesSection/> 
+        </div>
+        <div className='block md:hidden'>
+
+        <CarsForSaleSectionTwo/>
         </div>
         <CarInspectionSection/>
-        <WhyChooseUsSection/>
+        <WhyChooseUsTwo/>
+        
+        {/* <WhyChooseUsSection/> */}
         <TestimonialsSection/>
         <FaqAccordion/>
         <CallToAction/>
