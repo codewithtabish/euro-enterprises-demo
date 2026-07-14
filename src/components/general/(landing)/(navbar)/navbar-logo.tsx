@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 
 interface LogoProps {
@@ -26,7 +26,7 @@ export default function NavBarLogo({
 }: LogoProps) {
   const { icon: iconSize, text: textSize } = sizeMap[size];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -37,7 +37,7 @@ export default function NavBarLogo({
     },
   };
 
-  const letterVariants = {
+  const letterVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -50,7 +50,7 @@ export default function NavBarLogo({
     },
   };
 
-  const iconVariants = {
+  const iconVariants: Variants = {
     hidden: { scale: 0.8, opacity: 0, rotate: -10 },
     visible: {
       scale: 1,
@@ -64,11 +64,11 @@ export default function NavBarLogo({
     },
   };
 
-  const hoverVariants = {
+  const hoverVariants: Variants = {
     rest: { scale: 1 },
     hover: {
       scale: 1.05,
-      transition: { duration: 0.2, ease: "easeOut" },
+      transition: { duration: 0.2, ease: "easeOut" as const },
     },
   };
 
@@ -80,17 +80,17 @@ export default function NavBarLogo({
   // Superscript: E, S (last letters of each word)
   const getLetterStyle = (letter: string, index: number) => {
     const styles: string[] = [];
-    
+
     // Italic for first 4 letters (E, U, R, O)
     if (index < 4) {
       styles.push("italic");
     }
-    
+
     // Superscript effect for last letters of each word
     if (index === 3 || index === 16) { // O in EURO, S in ENTERPRISES
       styles.push("align-super text-[0.7em] inline-block -translate-y-1");
     }
-    
+
     return styles.join(" ");
   };
 
@@ -225,7 +225,7 @@ export default function NavBarLogo({
                   ${letter !== " " ? getLetterStyle(letter, i) : ""}
                 `}
               >
-                {letter === " " ? "\u00A0" : letter}
+                {letter === " " ? " " : letter}
               </motion.span>
             ))}
           </motion.div>
