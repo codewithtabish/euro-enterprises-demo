@@ -163,8 +163,8 @@ export default function ContactUsComp() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: string | null) => {
+    setFormData((prev) => ({ ...prev, [field]: value ?? "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -618,7 +618,6 @@ export default function ContactUsComp() {
                         <Button 
                           variant="outline" 
                           className="w-full border-border/60 hover:bg-accent hover:text-foreground rounded-xl h-11"
-                          asChild
                         >
                           <Link 
                             href="https://maps.google.com" 
@@ -749,7 +748,6 @@ export default function ContactUsComp() {
                           size="lg"
                           variant="outline"
                           className="border-border hover:bg-accent hover:text-foreground font-semibold px-8 h-14 rounded-xl"
-                          asChild
                         >
                           <Link href="/inventory">
                             Browse Inventory
