@@ -1,16 +1,20 @@
+import { ChartAreaInteractive } from '@/components/chart-area-interactive'
+import { DataTable } from '@/components/data-table'
+import { SectionCards } from '@/components/section-cards'
 import React from 'react'
 
 const DashboardPage = () => {
   return (
     <div>
     
-        <h3>
-            ONLY ALI ADMIN CAN USE THIS 
-            <hr />
-            <hr />
-            <br /><br />
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. At sapiente commodi possimus maxime quod libero eaque sequi enim unde dolores rem nihil repellat delectus autem optio, nesciunt corrupti corporis eius.
-        </h3>
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+            <DataTable  />
+
+            </div>
 
     </div>
   )

@@ -4,8 +4,14 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Download, FileText, QrCode } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+       const pathname = usePathname();
+  
+          if (pathname.startsWith("/dashboard")) {
+    return null;
+  }
   return (
     <footer className={'relative overflow-hidden border-t border-border bg-background'}>
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">

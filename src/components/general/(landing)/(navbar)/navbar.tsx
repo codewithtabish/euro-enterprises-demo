@@ -12,6 +12,7 @@ import {
   useUser,
 } from "@clerk/nextjs";
 import NavBarLogo from './navbar-logo';
+import { usePathname } from 'next/navigation';
 
 const menuItems = [
   { name: 'Cars', href: '#', hasDropdown: true },
@@ -35,8 +36,11 @@ const ADMIN_EMAILS = [
 // ─── UserMenu Component (DECLARED OUTSIDE) ─────────────────────
 function UserMenu() {
   const { user } = useUser();
+
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
   const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
+
+
 
   return (
     <UserButton
@@ -98,6 +102,12 @@ function MobileDropdownButton({ menuState, setMenuState }: { menuState: boolean;
 const APPNavBar = () => {
   const [menuState, setMenuState] = useState(false);
   const [carsOpen, setCarsOpen] = useState(false);
+      const pathname = usePathname();
+
+        if (pathname.startsWith("/dashboard")) {
+  return null;
+}
+
 
   return (
     <header className="sticky top-0 z-50 w-full">
