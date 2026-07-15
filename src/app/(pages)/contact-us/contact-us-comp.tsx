@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import React, { useRef, useMemo } from "react";
+import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import { 
   MapPin, 
   Phone, 
   Mail, 
   Clock, 
-  Send, 
-  CheckCircle2, 
   Car, 
   Wrench, 
   Shield, 
@@ -17,29 +15,18 @@ import {
   MessageSquare,
   ChevronRight,
   Star,
-  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
+import ContactFormComp from "./contact-form-comp";
 
 // ─── Contact Info Data ───────────────────────────────────────────
 const contactInfo = [
   {
     icon: MapPin,
     title: "Visit Our Showroom",
-    detail: "1234 Auto Boulevard, Motor City, MC 56789",
+    detail: "Clifton Block 1, Karachi, Pakistan",
     sub: "Open for test drives & consultations",
     color: "from-blue-500/20 to-blue-600/5",
     borderColor: "border-blue-500/30",
@@ -48,7 +35,7 @@ const contactInfo = [
   {
     icon: Phone,
     title: "Call Us Anytime",
-    detail: "+1 (555) 234-5678",
+    detail: "+92 3499000919",
     sub: "24/7 roadside assistance available",
     color: "from-emerald-500/20 to-emerald-600/5",
     borderColor: "border-emerald-500/30",
@@ -57,7 +44,7 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email Support",
-    detail: "hello@euroenterprises.com",
+    detail: "hello@euroenterprises.rent",
     sub: "We reply within 2 hours",
     color: "from-amber-500/20 to-amber-600/5",
     borderColor: "border-amber-500/30",
@@ -66,8 +53,8 @@ const contactInfo = [
   {
     icon: Clock,
     title: "Business Hours",
-    detail: "Mon – Sat: 9:00 AM – 8:00 PM",
-    sub: "Sunday: 11:00 AM – 5:00 PM",
+    detail: "24/7 Business Hours",
+    sub: "Always open for your convenience",
     color: "from-rose-500/20 to-rose-600/5",
     borderColor: "border-rose-500/30",
     iconColor: "text-rose-600 dark:text-rose-400",
@@ -81,15 +68,14 @@ const services = [
   { icon: Star, label: "Trade-Ins", desc: "Best value" },
 ];
 
-const inquiryTypes = [
-  "Vehicle Purchase",
-  "Service Appointment",
-  "Financing Inquiry",
-  "Trade-In Evaluation",
-  "General Question",
-  "Parts & Accessories",
-  "Warranty Claim",
-  "Feedback",
+// ─── Pre-generated particle data (NO Math.random in render!) ────
+const PARTICLE_DATA = [
+  { width: 250, height: 280, left: "39%", top: "55%", duration: 12, delay: 0 },
+  { width: 130, height: 300, left: "35%", top: "38%", duration: 10, delay: 1 },
+  { width: 320, height: 280, left: "46%", top: "65%", duration: 14, delay: 2 },
+  { width: 170, height: 150, left: "97%", top: "54%", duration: 11, delay: 0.5 },
+  { width: 280, height: 380, left: "78%", top: "62%", duration: 13, delay: 1.5 },
+  { width: 290, height: 140, left: "62%", top: "16%", duration: 9, delay: 2.5 },
 ];
 
 // ─── Animated Section Wrapper ────────────────────────────────────
@@ -120,17 +106,20 @@ function AnimatedSection({
 
 // ─── Floating Particles Background ───────────────────────────────
 function FloatingParticles() {
+  // Use useMemo with stable data - NO Math.random!
+  const particles = useMemo(() => PARTICLE_DATA, []);
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30 dark:opacity-100">
-      {[...Array(6)].map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full bg-primary/5 dark:bg-blue-500/10"
           style={{
-            width: Math.random() * 300 + 100,
-            height: Math.random() * 300 + 100,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            width: p.width,
+            height: p.height,
+            left: p.left,
+            top: p.top,
           }}
           animate={{
             y: [0, -30, 0],
@@ -138,10 +127,10 @@ function FloatingParticles() {
             scale: [1, 1.1, 1],
           }}
           transition={{
-            duration: Math.random() * 8 + 6,
+            duration: p.duration,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: Math.random() * 3,
+            delay: p.delay,
           }}
         />
       ))}
@@ -151,49 +140,9 @@ function FloatingParticles() {
 
 // ─── Main Contact Page ─────────────────────────────────────────────
 export default function ContactUsComp() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    inquiryType: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
-
-  const handleChange = (field: string, value: string | null) => {
-    setFormData((prev) => ({ ...prev, [field]: value ?? "" }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate API call with purposeful delay for trust
-    await new Promise((resolve) => setTimeout(resolve, 1800));
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success("Message sent! We'll get back to you within 2 hours.");
-  };
-
-  const resetForm = () => {
-    setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      inquiryType: "",
-      message: "",
-    });
-    setIsSubmitted(false);
-  };
-
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Ambient Background — theme adaptive */}
+      {/* Ambient Background */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background dark:from-blue-900/10 dark:via-background dark:to-background" />
       <FloatingParticles />
 
@@ -228,7 +177,7 @@ export default function ContactUsComp() {
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
                 <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent">
-                  Let's Start Your
+                  Let&apos;s Start Your
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
@@ -237,8 +186,8 @@ export default function ContactUsComp() {
               </h1>
 
               <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Whether you're hunting for your dream car, need expert service, 
-                or just want to chat about options — we're here, ready to help.
+                Whether you&apos;re hunting for your dream car, need expert service, 
+                or just want to chat about options — we&apos;re here, ready to help.
               </p>
             </motion.div>
           </div>
@@ -297,264 +246,7 @@ export default function ContactUsComp() {
               {/* ─── LEFT: Contact Form ─── */}
               <div className="lg:col-span-3">
                 <AnimatedSection>
-                  <Card className="border-border/60 bg-card/50 backdrop-blur-xl overflow-hidden">
-                    {/* Form Header */}
-                    <div className="px-6 py-6 md:px-8 md:py-8 border-b border-border/40">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-                          <Send className="w-4 h-4 text-primary" />
-                        </div>
-                        <div>
-                          <h2 className="text-xl md:text-2xl font-bold text-foreground">
-                            Send us a Message
-                          </h2>
-                          <p className="text-sm text-muted-foreground">
-                            Fill out the form and we'll respond within 2 hours
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <CardContent className="p-6 md:p-8">
-                      <AnimatePresence mode="wait">
-                        {isSubmitted ? (
-                          <motion.div
-                            key="success"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="text-center py-12"
-                          >
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                              className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6"
-                            >
-                              <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
-                            </motion.div>
-                            <h3 className="text-2xl font-bold text-foreground mb-3">
-                              Message Sent Successfully!
-                            </h3>
-                            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-                              Thanks for reaching out. Our team will review your inquiry 
-                              and get back to you within 2 hours during business hours.
-                            </p>
-                            <Button
-                              onClick={resetForm}
-                              variant="outline"
-                              className="border-border hover:bg-accent hover:text-foreground"
-                            >
-                              Send Another Message
-                            </Button>
-                          </motion.div>
-                        ) : (
-                          <motion.form
-                            key="form"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onSubmit={handleSubmit}
-                            className="space-y-6"
-                          >
-                            {/* Name Row */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                              <div className="space-y-2.5">
-                                <Label htmlFor="firstName" className="text-foreground/80 text-sm font-medium">
-                                  First Name
-                                </Label>
-                                <motion.div
-                                  animate={{ 
-                                    scale: focusedField === "firstName" ? 1.01 : 1,
-                                  }}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  <Input
-                                    id="firstName"
-                                    placeholder="John"
-                                    value={formData.firstName}
-                                    onChange={(e) => handleChange("firstName", e.target.value)}
-                                    onFocus={() => setFocusedField("firstName")}
-                                    onBlur={() => setFocusedField(null)}
-                                    required
-                                    className="bg-background/50 border-border/60 text-foreground placeholder:text-muted-foreground/50 
-                                      focus:border-primary/50 focus:ring-primary/20 h-12 rounded-xl
-                                      transition-all duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                              <div className="space-y-2.5">
-                                <Label htmlFor="lastName" className="text-foreground/80 text-sm font-medium">
-                                  Last Name
-                                </Label>
-                                <motion.div
-                                  animate={{ 
-                                    scale: focusedField === "lastName" ? 1.01 : 1,
-                                  }}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  <Input
-                                    id="lastName"
-                                    placeholder="Doe"
-                                    value={formData.lastName}
-                                    onChange={(e) => handleChange("lastName", e.target.value)}
-                                    onFocus={() => setFocusedField("lastName")}
-                                    onBlur={() => setFocusedField(null)}
-                                    required
-                                    className="bg-background/50 border-border/60 text-foreground placeholder:text-muted-foreground/50 
-                                      focus:border-primary/50 focus:ring-primary/20 h-12 rounded-xl
-                                      transition-all duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                            </div>
-
-                            {/* Email & Phone Row */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                              <div className="space-y-2.5">
-                                <Label htmlFor="email" className="text-foreground/80 text-sm font-medium">
-                                  Email Address
-                                </Label>
-                                <motion.div
-                                  animate={{ 
-                                    scale: focusedField === "email" ? 1.01 : 1,
-                                  }}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="john@example.com"
-                                    value={formData.email}
-                                    onChange={(e) => handleChange("email", e.target.value)}
-                                    onFocus={() => setFocusedField("email")}
-                                    onBlur={() => setFocusedField(null)}
-                                    required
-                                    className="bg-background/50 border-border/60 text-foreground placeholder:text-muted-foreground/50 
-                                      focus:border-primary/50 focus:ring-primary/20 h-12 rounded-xl
-                                      transition-all duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                              <div className="space-y-2.5">
-                                <Label htmlFor="phone" className="text-foreground/80 text-sm font-medium">
-                                  Phone Number
-                                </Label>
-                                <motion.div
-                                  animate={{ 
-                                    scale: focusedField === "phone" ? 1.01 : 1,
-                                  }}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  <Input
-                                    id="phone"
-                                    type="tel"
-                                    placeholder="+1 (555) 000-0000"
-                                    value={formData.phone}
-                                    onChange={(e) => handleChange("phone", e.target.value)}
-                                    onFocus={() => setFocusedField("phone")}
-                                    onBlur={() => setFocusedField(null)}
-                                    className="bg-background/50 border-border/60 text-foreground placeholder:text-muted-foreground/50 
-                                      focus:border-primary/50 focus:ring-primary/20 h-12 rounded-xl
-                                      transition-all duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                            </div>
-
-                            {/* Inquiry Type */}
-                            <div className="space-y-2.5">
-                              <Label className="text-foreground/80 text-sm font-medium">
-                                Inquiry Type
-                              </Label>
-                              <Select 
-                                value={formData.inquiryType} 
-                                onValueChange={(value) => handleChange("inquiryType", value)}
-                              >
-                                <SelectTrigger className="bg-background/50 border-border/60 text-foreground h-12 rounded-xl 
-                                  focus:ring-primary/20 focus:border-primary/50">
-                                  <SelectValue placeholder="Select what you need help with" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-popover border-border text-foreground">
-                                  {inquiryTypes.map((type) => (
-                                    <SelectItem 
-                                      key={type} 
-                                      value={type}
-                                      className="focus:bg-primary/10 focus:text-foreground"
-                                    >
-                                      {type}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Message */}
-                            <div className="space-y-2.5">
-                              <Label htmlFor="message" className="text-foreground/80 text-sm font-medium">
-                                Your Message
-                              </Label>
-                              <motion.div
-                                animate={{ 
-                                  scale: focusedField === "message" ? 1.005 : 1,
-                                }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <Textarea
-                                  id="message"
-                                  placeholder="Tell us about your dream car, service needs, or any questions you have..."
-                                  value={formData.message}
-                                  onChange={(e) => handleChange("message", e.target.value)}
-                                  onFocus={() => setFocusedField("message")}
-                                  onBlur={() => setFocusedField(null)}
-                                  required
-                                  rows={5}
-                                  className="bg-background/50 border-border/60 text-foreground placeholder:text-muted-foreground/50 
-                                    focus:border-primary/50 focus:ring-primary/20 rounded-xl resize-none
-                                    transition-all duration-300"
-                                />
-                              </motion.div>
-                            </div>
-
-                            {/* Submit Button */}
-                            <motion.div
-                              whileHover={{ scale: 1.01 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              <Button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full h-14 bg-primary hover:bg-primary/90
-                                  text-primary-foreground font-semibold text-base rounded-xl shadow-lg shadow-primary/25
-                                  disabled:opacity-70 disabled:cursor-not-allowed
-                                  transition-all duration-300"
-                              >
-                                {isSubmitting ? (
-                                  <span className="flex items-center gap-2">
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    Sending your message...
-                                  </span>
-                                ) : (
-                                  <span className="flex items-center gap-2">
-                                    Send Message
-                                    <ArrowRight className="w-5 h-5" />
-                                  </span>
-                                )}
-                              </Button>
-                            </motion.div>
-
-                            <p className="text-xs text-center text-muted-foreground">
-                              By submitting, you agree to our{" "}
-                              <Link href="/privacy" className="text-primary hover:text-primary/80 underline underline-offset-2">
-                                Privacy Policy
-                              </Link>
-                              . We never share your data.
-                            </p>
-                          </motion.form>
-                        )}
-                      </AnimatePresence>
-                    </CardContent>
-                  </Card>
+                  <ContactFormComp />
                 </AnimatedSection>
               </div>
 
@@ -565,7 +257,6 @@ export default function ContactUsComp() {
                   <Card className="border-border/60 bg-card/50 backdrop-blur-xl overflow-hidden">
                     <CardContent className="p-0">
                       <div className="relative h-64 md:h-80 bg-muted/50 overflow-hidden">
-                        {/* Stylized Map Placeholder with Grid */}
                         <div className="absolute inset-0 bg-muted/30">
                           <div 
                             className="absolute inset-0 opacity-30 dark:opacity-20"
@@ -574,14 +265,12 @@ export default function ContactUsComp() {
                               backgroundSize: "40px 40px",
                             }}
                           />
-                          {/* Roads */}
                           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 300">
                             <path d="M0 150 Q100 140 200 150 T400 150" stroke="rgba(59,130,246,0.3)" strokeWidth="8" fill="none"/>
                             <path d="M200 0 Q210 100 200 150 T200 300" stroke="rgba(59,130,246,0.3)" strokeWidth="8" fill="none"/>
                             <path d="M50 50 Q150 100 200 150" stroke="rgba(59,130,246,0.15)" strokeWidth="4" fill="none"/>
                             <path d="M350 50 Q250 100 200 150" stroke="rgba(59,130,246,0.15)" strokeWidth="4" fill="none"/>
                           </svg>
-                          {/* Location Pin */}
                           <motion.div
                             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full"
                             animate={{ y: [0, -8, 0] }}
@@ -594,22 +283,20 @@ export default function ContactUsComp() {
                               <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary rotate-45" />
                             </div>
                           </motion.div>
-                          {/* Pulse Ring */}
                           <motion.div
                             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full border-2 border-primary/30"
                             animate={{ scale: [1, 2], opacity: [0.5, 0] }}
                             transition={{ duration: 2, repeat: Infinity }}
                           />
                         </div>
-                        {/* Map Overlay Info */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background/90 to-transparent">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
                               <MapPin className="w-4 h-4 text-primary" />
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-foreground">Euro Enterprises HQ</p>
-                              <p className="text-xs text-muted-foreground">1234 Auto Boulevard, Motor City</p>
+                              <p className="text-sm font-semibold text-foreground">Euro Enterprises</p>
+                              <p className="text-xs text-muted-foreground">Clifton Block 1, Karachi</p>
                             </div>
                           </div>
                         </div>
@@ -620,7 +307,7 @@ export default function ContactUsComp() {
                           className="w-full border-border/60 hover:bg-accent hover:text-foreground rounded-xl h-11"
                         >
                           <Link 
-                            href="https://maps.google.com" 
+                            href="https://maps.google.com/?q=Clifton+Block+1+Karachi" 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2"
@@ -710,7 +397,6 @@ export default function ContactUsComp() {
           <div className="max-w-7xl mx-auto">
             <AnimatedSection>
               <Card className="relative overflow-hidden border-border/60 bg-gradient-to-br from-primary/5 via-card/80 to-background backdrop-blur-xl">
-                {/* Decorative Elements */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl" />
 
@@ -763,9 +449,6 @@ export default function ContactUsComp() {
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            FOOTER SPACER
-        ═══════════════════════════════════════════════════════════ */}
         <div className="h-8" />
       </div>
     </div>
