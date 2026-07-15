@@ -74,7 +74,7 @@ const Footer = () => {
               {/* Download Proposal */}
               <li>
                 <a 
-                  href="/docs/proposal.pdf" 
+                  href="/download/proposal.pdf" 
   download="proposal.pdf"
                   className="inline-flex items-center gap-2 hover:text-primary transition-colors group"
                 >
@@ -83,14 +83,7 @@ const Footer = () => {
                   <Download className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </a>
               </li>
-              <a
-  href="https://drive.google.com/uc?export=download&id=1p_PNvt0Sxe_KbB9zEVHwMpf8QwpRnHee"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center gap-2 hover:text-primary transition-colors group"
->
-  Download Proposal Online
-</a>
+   
 
 
 

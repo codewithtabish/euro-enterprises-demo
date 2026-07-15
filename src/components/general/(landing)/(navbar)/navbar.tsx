@@ -32,7 +32,7 @@ const ADMIN_EMAILS = [
   "alii.9000919@gmail.com",
 ];
 
-// ─── UserMenu Component (DECLARED OUTSIDE - NOT inside APPNavBar) ──
+// ─── UserMenu Component (DECLARED OUTSIDE) ─────────────────────
 function UserMenu() {
   const { user } = useUser();
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
@@ -67,6 +67,34 @@ function UserMenu() {
   );
 }
 
+// ─── BookingIcon Component (visible when logged in) ────────────
+function BookingIcon() {
+  return (
+    <Link
+      href="/bookings"
+      className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary transition-colors"
+      title="My Bookings"
+    >
+      <Calendar className="h-4 w-4" />
+    </Link>
+  );
+}
+
+// ─── MobileDropdownButton Component (ChevronDown icon) ───────────
+function MobileDropdownButton({ menuState, setMenuState }: { menuState: boolean; setMenuState: (v: boolean) => void }) {
+  return (
+    <button
+      onClick={() => setMenuState(!menuState)}
+      aria-label={menuState ? 'Close Menu' : 'Open Menu'}
+      className="relative z-50 p-2 text-foreground hover:bg-accent rounded-xl transition-colors"
+    >
+      <ChevronDown 
+        className={`size-5 transition-all duration-300 ${menuState ? 'rotate-180' : ''}`} 
+      />
+    </button>
+  );
+}
+
 const APPNavBar = () => {
   const [menuState, setMenuState] = useState(false);
   const [carsOpen, setCarsOpen] = useState(false);
@@ -79,7 +107,11 @@ const APPNavBar = () => {
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
-            <NavBarLogo />
+
+            {/* Logo - DESKTOP ONLY (hidden on mobile) */}
+            <div className="hidden lg:block">
+              <NavBarLogo />
+            </div>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center justify-center flex-1 gap-10">
@@ -129,10 +161,12 @@ const APPNavBar = () => {
             </div>
 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+
+              {/* Mode Toggle - ALWAYS visible */}
               <ModeToggle />
 
-              {/* Desktop Auth */}
+              {/* DESKTOP: Booking Icon + Auth */}
               <div className="hidden lg:flex items-center gap-3">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
@@ -143,34 +177,28 @@ const APPNavBar = () => {
                 </Show>
 
                 <Show when="signed-in">
+                  <BookingIcon />
                   <UserMenu />
                 </Show>
               </div>
 
-              {/* Mobile Auth */}
-              <div className="lg:hidden">
+              {/* MOBILE: All icons + Dropdown Button (NO logo here) */}
+              <div className="lg:hidden flex items-center gap-2">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
                     <Button variant="outline" size="icon" className="h-9 w-9">
                       <span className="text-xs font-medium">Log in</span>
                     </Button>
                   </SignInButton>
+                  <MobileDropdownButton menuState={menuState} setMenuState={setMenuState} />
                 </Show>
 
                 <Show when="signed-in">
+                  <BookingIcon />
                   <UserMenu />
+                  <MobileDropdownButton menuState={menuState} setMenuState={setMenuState} />
                 </Show>
               </div>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setMenuState(!menuState)}
-                aria-label={menuState ? 'Close Menu' : 'Open Menu'}
-                className="lg:hidden relative z-50 -mr-2 p-2 text-foreground hover:bg-accent rounded-xl transition-colors"
-              >
-                <Menu className={`size-6 transition-all duration-300 ${menuState ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`} />
-                <X className={`absolute inset-0 m-auto size-6 transition-all duration-300 ${menuState ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} />
-              </button>
             </div>
           </div>
         </div>
