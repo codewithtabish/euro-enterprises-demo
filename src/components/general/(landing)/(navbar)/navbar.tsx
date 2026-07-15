@@ -3,14 +3,14 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, LayoutDashboard, Calendar } from 'lucide-react';
 import { ModeToggle } from '../../(themes)/theme-toggler';
 import {
   Show,
   SignInButton,
   UserButton,
+  useUser,
 } from "@clerk/nextjs";
-import Image from 'next/image';
 import NavBarLogo from './navbar-logo';
 
 const menuItems = [
@@ -26,22 +26,60 @@ const carSubmenu = [
   { name: 'Sales', href: '/cars/sales' },
 ];
 
+// ─── Multiple Admin Emails ─────────────────────────────────────
+const ADMIN_EMAILS = [
+  "info@euroenterprises.rent",
+  "alii.9000919@gmail.com",
+];
+
+// ─── UserMenu Component (DECLARED OUTSIDE - NOT inside APPNavBar) ──
+function UserMenu() {
+  const { user } = useUser();
+  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
+
+  return (
+    <UserButton
+      appearance={{
+        elements: {
+          avatarBox: "h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-border hover:ring-primary/50 transition-all",
+        },
+      }}
+    >
+      <UserButton.MenuItems>
+        {/* Dashboard - ONLY for admins */}
+        {isAdmin && (
+          <UserButton.Link
+            label="Dashboard"
+            labelIcon={<LayoutDashboard className="h-4 w-4" />}
+            href="/dashboard"
+          />
+        )}
+
+        {/* My Bookings - for EVERYONE logged in */}
+        <UserButton.Link
+          label="My Bookings"
+          labelIcon={<Calendar className="h-4 w-4" />}
+          href="/bookings"
+        />
+      </UserButton.MenuItems>
+    </UserButton>
+  );
+}
+
 const APPNavBar = () => {
   const [menuState, setMenuState] = useState(false);
   const [carsOpen, setCarsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full ">
+    <header className="sticky top-0 z-50 w-full">
       <nav
         data-state={menuState ? 'active' : undefined}
         className="border-b border-border bg-white/95 backdrop-blur-lg dark:bg-zinc-950/95 transition-all duration-300"
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
-            <NavBarLogo/>
-
- 
-            
+            <NavBarLogo />
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center justify-center flex-1 gap-10">
@@ -68,7 +106,6 @@ const APPNavBar = () => {
                     </Link>
                   )}
 
-
                   {/* Cars Dropdown */}
                   {item.hasDropdown && carsOpen && (
                     <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-52 rounded-2xl bg-white dark:bg-zinc-900 border border-border shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -89,9 +126,6 @@ const APPNavBar = () => {
                   )}
                 </div>
               ))}
-
-          
-
             </div>
 
             {/* Right Side Actions */}
@@ -102,27 +136,18 @@ const APPNavBar = () => {
               <div className="hidden lg:flex items-center gap-3">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
-                       <Button className={'md:px-5 px-4 md:py-6 py-4 cursor-pointer'} variant={'secondary'}>
-                Get Started
-              </Button>
-              {/* <GooeyButton  /> */}
-
-              
+                    <Button className={'md:px-5 px-4 md:py-6 py-4 cursor-pointer'} variant={'secondary'}>
+                      Get Started
+                    </Button>
                   </SignInButton>
                 </Show>
 
                 <Show when="signed-in">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-border hover:ring-primary/50 transition-all",
-                      },
-                    }}
-                  />
+                  <UserMenu />
                 </Show>
               </div>
 
-              {/* Mobile Auth - Only Login Button (Small Badge Style) */}
+              {/* Mobile Auth */}
               <div className="lg:hidden">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
@@ -133,13 +158,7 @@ const APPNavBar = () => {
                 </Show>
 
                 <Show when="signed-in">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox: "h-9 w-9",
-                      },
-                    }}
-                  />
+                  <UserMenu />
                 </Show>
               </div>
 
@@ -156,11 +175,11 @@ const APPNavBar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu - NO Auth Buttons */}
+        {/* Mobile Menu */}
         <div
-          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6  shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
+          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6 shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
         >
-          <ul className="space-y-6 text-base font-medium">
+          <ul className="space-y-6 text-base font-medium py-6">
             {menuItems.map((item, index) => (
               <li key={index} className="border-b border-border last:border-0 pb-6 last:pb-0">
                 {item.hasDropdown ? (
