@@ -31,6 +31,7 @@ export default function BlogPreviewPage() {
     <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-4xl mx-auto prose dark:prose-invert">
         <BlogPreviewer content={content.content} />
+     
       </div>
     </div>
   );

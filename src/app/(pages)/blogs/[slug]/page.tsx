@@ -111,7 +111,7 @@ export default async function SingleBlogPage({ params }: PageProps) {
       </section>
 
       {/* ========== BLOG CONTENT + TABLE OF CONTENTS ========== */}
-      <Container className="py-12 md:py-16">
+      <Container className="py-12 md:py-16 lg:w-[80%]">
         <div className="flex gap-8 lg:gap-12">
           {/* Main Content */}
           <div className="flex-1 min-w-0">
