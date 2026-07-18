@@ -62,7 +62,7 @@ export default async function BlogListComponent() {
               <Card className="overflow-hidden border-border/60 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:border-primary/30">
                 <div className="grid md:grid-cols-2 gap-0">
                   {/* Image Side */}
-                  <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[360px] overflow-hidden bg-muted">
+                  <div className="relative aspect-16/10 md:aspect-auto md:min-h-[360px] overflow-hidden bg-muted">
                     <Image
                       src={heroBlog.bannerImage}
                       alt={heroBlog.bannerImageAlt || heroBlog.title}
@@ -72,7 +72,7 @@ export default async function BlogListComponent() {
                       priority
                     />
                     {/* Overlay gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent md:hidden" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent md:hidden" />
                   </div>
 
                   {/* Content Side */}
@@ -221,7 +221,7 @@ export default async function BlogListComponent() {
                   className="group block"
                 >
                   <Card className="overflow-hidden border-border/60 h-full hover:shadow-lg transition-all duration-300 group-hover:border-primary/20 hover:-translate-y-1">
-                    <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                    <div className="relative aspect-16/10 overflow-hidden bg-muted">
                       <Image
                         src={blog.bannerImage}
                         alt={blog.bannerImageAlt || blog.title}
