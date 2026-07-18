@@ -1,5 +1,3 @@
-// components/general/container.tsx
-
 import { cn } from "@/lib/utils";
 
 export function Container({
@@ -11,13 +9,28 @@ export function Container({
 }) {
   return (
     <div
-     className={cn(
-  "mx-auto w-full max-w-full  sm:px-6 md:max-w-3xl lg:max-w-5xl xl:max-w-7xl 2xl:max-w-[1440px] 2xl:px-8",
-  className
-)}
+      className={cn(
+        // Mobile: full width with safe padding
+        "mx-auto w-full px-4",
+        
+        // Small screens
+        "sm:px-6",
+        
+        // Medium: comfortable width
+        "md:px-8",
+        
+        // Large: 95% width — removes side gaps
+        "lg:w-[98%] lg:px-10",
+        
+        // Extra large: 95% width
+        "xl:w-[95%] xl:px-12",
+        
+        // 2XL: 95% width
+        "2xl:w-[95%] 2xl:px-16",
+        
+        className
+      )}
     >
-            {/* <GradientDotMesh /> */}
-      
       {children}
     </div>
   );

@@ -40,8 +40,6 @@ function UserMenu() {
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
   const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
 
-
-
   return (
     <UserButton
       appearance={{
@@ -84,7 +82,7 @@ function BookingIcon() {
   );
 }
 
-// ─── MobileDropdownButton Component (ChevronDown icon) ───────────
+// ─── MobileDropdownButton Component ────────────────────────────
 function MobileDropdownButton({ menuState, setMenuState }: { menuState: boolean; setMenuState: (v: boolean) => void }) {
   return (
     <button
@@ -102,12 +100,14 @@ function MobileDropdownButton({ menuState, setMenuState }: { menuState: boolean;
 const APPNavBar = () => {
   const [menuState, setMenuState] = useState(false);
   const [carsOpen, setCarsOpen] = useState(false);
-      const pathname = usePathname();
+  const pathname = usePathname();
 
-        if (pathname.startsWith("/dashboard")) {
-  return null;
-}
+  // ✅ HIDE on dashboard AND on any blog detail page (/blogs/[slug])
+  const shouldHide = pathname.startsWith("/dashboard") || pathname.startsWith("/blogs/");
 
+  if (shouldHide) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full">
@@ -192,7 +192,7 @@ const APPNavBar = () => {
                 </Show>
               </div>
 
-              {/* MOBILE: All icons + Dropdown Button (NO logo here) */}
+              {/* MOBILE: All icons + Dropdown Button */}
               <div className="lg:hidden flex items-center gap-2">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
