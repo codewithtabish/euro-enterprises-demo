@@ -51,7 +51,11 @@ const getFeaturedBlogsCached = unstable_cache(
         publishedAt: true,
         createdAt: true,
         tableOfContents: true,
+        shortDescription:true
+          
+        
       },
+      
     });
 
     return blogs;
@@ -105,10 +109,12 @@ const getAllBlogsCached = unstable_cache(
         bannerImage: true,
         bannerImageAlt: true,
         featured: true,
+        
         status: true,
         publishedAt: true,
         createdAt: true,
         tableOfContents: true,
+        shortDescription:true,
       },
     });
 

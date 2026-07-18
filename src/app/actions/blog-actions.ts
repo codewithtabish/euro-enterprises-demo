@@ -187,7 +187,7 @@ export async function createBlogAction(data: CreateBlogInput) {
         seo: true,
       },
     });
-
+// 
     console.log("✅ Blog created:", blog.id, "| shortDescription:", blog.shortDescription);
 
     // Step 7: REVALIDATE CACHE so new blog appears in lists immediately

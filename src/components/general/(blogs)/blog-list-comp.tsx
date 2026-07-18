@@ -89,9 +89,10 @@ export default async function BlogListComponent() {
                     </h2>
 
                     <p className="text-muted-foreground text-sm md:text-base leading-relaxed mb-6 line-clamp-3">
-                      Discover how AI is transforming industries and learn about the latest
-                      advancements in artificial intelligence. Discover how AI is transforming
-                      industries and learn about the latest advancements in artificial intelligence.
+                      {
+                                                  // @ts-ignore
+
+                      heroBlog.shortDescription}
                     </p>
 
                     <div className="flex items-center justify-between mt-auto">
@@ -146,7 +147,7 @@ export default async function BlogListComponent() {
                 >
                   <Card className="overflow-hidden border-border/60 h-full hover:shadow-lg transition-all duration-300 group-hover:border-primary/20 hover:-translate-y-1">
                     {/* Image */}
-                    <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                    <div className="relative aspect-16/10 overflow-hidden bg-muted">
                       <Image
                         src={blog.bannerImage}
                         alt={blog.bannerImageAlt || blog.title}
@@ -169,8 +170,10 @@ export default async function BlogListComponent() {
                       </h3>
 
                       <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
-                        Learn proven strategies to grow your business and stay
-                        competitive in the ever-evolving market landscape.
+                      
+                        {
+                          // @ts-ignore
+                        blog.shortDescription}
                       </p>
 
                       <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
