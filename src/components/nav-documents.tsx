@@ -17,6 +17,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { MoreHorizontalIcon, FolderIcon, ShareIcon, Trash2Icon } from "lucide-react"
+import { Container } from "./general/container"
+import { ModeToggle } from "./general/(themes)/theme-toggler"
 
 export function NavDocuments({
   items,
@@ -31,6 +33,8 @@ export function NavDocuments({
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Documents</SidebarGroupLabel>
+
+
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>

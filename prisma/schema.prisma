@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+}
+
+model Blog {
+  id                  String      @id @default(cuid())
+
+  // Content
+  title               String
+  slug                String      @unique
+  content             Json      @db.Json
+
+  // Images
+  bannerImage         String
+  bannerImageAlt      String
+
+  // Publishing
+  status              BlogStatus  @default(DRAFT)
+  featured            Boolean     @default(false)
+  publishedAt         DateTime?
+
+  // Extra Content
+  tableOfContents     Json?
+
+
+
+  // SEO (1:1)
+  seo                 BlogSEO?
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model BlogSEO {
+  id                  String      @id @default(cuid())
+
+  blogId              String      @unique
+  blog                Blog        @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  // Search Engine
+  metaTitle           String
+  metaDescription     String      @db.Text
+  canonicalUrl        String?
+
+  noIndex             Boolean     @default(false)
+  noFollow            Boolean     @default(false)
+
+  // Open Graph
+  ogTitle             String?
+  ogDescription       String?     @db.Text
+  ogImage             String?
+
+  // Twitter / X
+  twitterTitle        String?
+  twitterDescription  String?     @db.Text
+  twitterImage        String?
+
+  // Structured Data
+  schemaType          String      @default("Article")
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
