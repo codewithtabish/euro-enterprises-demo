@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
+
   },
   "dependencies": {
     "@alkhipce/editorjs-aitext": "^1.3.0",
