@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma-client";
 import { OpenAI } from "openai";
+import { revalidateBlogCache } from "./blogs-all-actions";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,7 +46,7 @@ function extractTextFromContent(content: any): string {
 }
 
 // ============================================
-// OPENAI: GENERATE SEO & METADATA
+// OPENAI: GENERATE SEO, SHORT DESCRIPTION & METADATA
 // ============================================
 async function generateSEOWithAI(title: string, contentText: string) {
   try {
@@ -54,11 +55,13 @@ async function generateSEOWithAI(title: string, contentText: string) {
       messages: [
         {
           role: "system",
-          content: `You are an expert SEO specialist and content marketer. Based on the blog title and content provided, generate professional SEO metadata.
+          content: `You are an expert SEO specialist and content marketer. Based on the blog title and content provided, generate professional SEO metadata AND a compelling short description.
 
 STRICT RULES:
 - DO NOT change or modify the title
 - DO NOT change or modify the slug
+- shortDescription must be 1-2 sentences, max 160 characters, engaging, click-worthy
+- shortDescription should summarize what the reader will learn
 - Generate compelling, click-worthy SEO metadata
 - Keep meta descriptions under 160 characters
 - Keep meta titles under 60 characters
@@ -67,7 +70,8 @@ STRICT RULES:
 
 Return this exact JSON structure:
 {
-  "metaTitle": "SEO-optimized title under 60 chars (can be same as input title if already good)",
+  "shortDescription": "Compelling 1-2 sentence summary max 160 chars",
+  "metaTitle": "SEO-optimized title under 60 chars",
   "metaDescription": "Compelling meta description under 160 chars",
   "ogDescription": "Engaging social media description",
   "twitterDescription": "Twitter-optimized description",
@@ -90,6 +94,7 @@ Return this exact JSON structure:
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
       return {
+        shortDescription: parsed.shortDescription || `Learn about ${title} — a comprehensive guide with expert insights.`,
         metaTitle: parsed.metaTitle || title,
         metaDescription: parsed.metaDescription || `Read about ${title}. Discover detailed insights and information.`,
         ogDescription: parsed.ogDescription || `Learn more about ${title}`,
@@ -101,8 +106,9 @@ Return this exact JSON structure:
 
     throw new Error("Invalid AI response format");
   } catch (error) {
-    console.error("OpenAI SEO generation error:", error);
+    console.error("OpenAI generation error:", error);
     return {
+      shortDescription: `Learn about ${title} — a comprehensive guide with expert insights and practical tips.`,
       metaTitle: title,
       metaDescription: `Read about ${title}. Discover detailed insights, tips, and comprehensive information in this in-depth guide.`,
       ogDescription: `Explore ${title} - a comprehensive guide with expert insights and practical information.`,
@@ -138,8 +144,10 @@ export async function createBlogAction(data: CreateBlogInput) {
     // Step 3: Extract text for AI
     const contentText = extractTextFromContent(data.content);
 
-    // Step 4: Generate SEO metadata with OpenAI
+    // Step 4: Generate SEO metadata + shortDescription with OpenAI
+    console.log("🤖 Generating SEO & shortDescription with OpenAI...");
     const seoData = await generateSEOWithAI(data.title, contentText);
+    console.log("✅ AI Generated shortDescription:", seoData.shortDescription);
 
     // Step 5: Build canonical URL
     const canonicalUrl = `${BASE_URL}/blogs/${data.slug}`;
@@ -149,6 +157,7 @@ export async function createBlogAction(data: CreateBlogInput) {
       data: {
         title: data.title,
         slug: data.slug,
+        shortDescription: seoData.shortDescription,  // ✅ AI GENERATED
         content: data.content,
         bannerImage: data.bannerImage,
         bannerImageAlt: data.title,
@@ -179,7 +188,11 @@ export async function createBlogAction(data: CreateBlogInput) {
       },
     });
 
-    console.log("✅ Blog created:", blog.id, "| TOC saved:", (blog.tableOfContents as any[])?.length || 0);
+    console.log("✅ Blog created:", blog.id, "| shortDescription:", blog.shortDescription);
+
+    // Step 7: REVALIDATE CACHE so new blog appears in lists immediately
+    await revalidateBlogCache();
+    console.log("🔄 Cache revalidated after blog creation");
 
     return {
       success: true,
@@ -188,6 +201,7 @@ export async function createBlogAction(data: CreateBlogInput) {
           id: blog.id,
           title: blog.title,
           slug: blog.slug,
+          shortDescription: blog.shortDescription,
           featured: blog.featured,
           status: blog.status,
           publishedAt: blog.publishedAt,
@@ -202,6 +216,7 @@ export async function createBlogAction(data: CreateBlogInput) {
         },
         tableOfContents: tableOfContents,
         aiGenerated: {
+          shortDescription: seoData.shortDescription,
           keywords: seoData.keywords,
           summary: seoData.summary,
         },
