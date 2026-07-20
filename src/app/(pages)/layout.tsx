@@ -5,9 +5,10 @@ import { ThemeProvider } from "@/components/general/(themes)/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Footer from "@/components/general/(common)/footer";
 import { ClerkProvider } from "@clerk/nextjs";
-import APPNavBar from "@/components/general/(landing)/(navbar)/navbar";
 import { APPNavBarLazy } from "@/components/general/(landing)/(navbar)/navbar-lazy-comp";
 import { UserSyncLazy } from "@/components/general/(common)/auth/user-sync.lazy";
+import { LastSeenTracker } from "@/components/general/(common)/auth/last-seen-tracker";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,6 +55,7 @@ export default function RootLayout({
             <main className="flex-1 relative z-10">
               <APPNavBarLazy/>
               <UserSyncLazy/>
+             <LastSeenTracker />
               {children}
             <Footer />
             </main>

@@ -2,6 +2,8 @@
 
 import prisma from "@/lib/prisma-client";
 import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
+
 
 // ============================================
 // SERVER ACTION: Sync User
@@ -70,4 +72,24 @@ export async function syncUserAction() {
         error instanceof Error ? error.message : "Failed to sync user.",
     };
   }
+}
+
+
+
+
+
+
+export async function updateLastSeen() {
+  const { userId } = await auth();
+
+  if (!userId) return;
+
+  await prisma.user.update({
+    where: {
+      clerkId: userId,
+    },
+    data: {
+      lastSeenAt: new Date(),
+    },
+  });
 }
