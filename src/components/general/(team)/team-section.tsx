@@ -36,7 +36,13 @@ const members = [
     {
         name: 'Muhammad Hamza Habib',
         role: 'Area Manager',
-        avatar: '/team/hamza.jpg',
+        avatar: '/team/hamza1.jpg',
+        link: '#',
+    },
+    {
+        name: 'Tayyab Awan',
+        role: 'Managing Director',
+        avatar: '/team/tayaab.jpg',
         link: '#',
     },
    

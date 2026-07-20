@@ -36,6 +36,10 @@ export default async function SingleBlogPage({ params }: PageProps) {
     redirect("/blogs");
   }
 
+
+
+  
+
   // ✅ Parse content
   const parsedContent =
     typeof blog.content === "string"
