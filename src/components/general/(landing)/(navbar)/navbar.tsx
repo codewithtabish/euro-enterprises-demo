@@ -40,6 +40,10 @@ function UserMenu() {
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
   const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
 
+
+
+
+
   return (
     <UserButton
       appearance={{

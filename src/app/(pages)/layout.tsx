@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Footer from "@/components/general/(common)/footer";
 import { ClerkProvider } from "@clerk/nextjs";
 import APPNavBar from "@/components/general/(landing)/(navbar)/navbar";
+import { APPNavBarLazy } from "@/components/general/(landing)/(navbar)/navbar-lazy-comp";
+import { UserSyncLazy } from "@/components/general/(common)/auth/user-sync.lazy";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,10 +52,11 @@ export default function RootLayout({
           <TooltipProvider>
             {/* Main Content */}
             <main className="flex-1 relative z-10">
-              <APPNavBar/>
+              <APPNavBarLazy/>
+              <UserSyncLazy/>
               {children}
-            </main>
             <Footer />
+            </main>
 
           </TooltipProvider>
         </ThemeProvider>
