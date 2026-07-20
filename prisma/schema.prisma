@@ -73,3 +73,49 @@ model BlogSEO {
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
 }
+
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id          String     @id @default(cuid())
+
+  // Clerk
+  clerkId     String     @unique
+
+  // Personal Information
+  firstName   String?
+  lastName    String?
+  fullName    String?
+
+  email       String     @unique
+  phone       String?    @unique
+
+  // Profile
+  avatar       String?
+
+  // Location
+  country      String?
+  city         String?
+  // Activity
+  lastLoginAt  DateTime?
+  lastSeenAt   DateTime?
+
+  // Authorization
+  role         UserRole  @default(USER)
+
+
+  // Timestamps
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([clerkId])
+  @@index([email])
+  @@index([role])
+  @@index([country])
+  @@index([city])
+}
+

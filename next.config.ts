@@ -1,20 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['*'], // <-- Allow ALL origins
+  
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",   // Allows ALL domains
+        hostname: "**",
       },
       {
         protocol: "http",
-        hostname: "**",   // Optional: also allow HTTP (not recommended for production)
+        hostname: "**",
       },
     ],
     qualities: [75, 90],
   },
-  
 };
 
 export default nextConfig;
