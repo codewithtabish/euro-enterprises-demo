@@ -1,12 +1,12 @@
-import React from 'react'
+import SalesCarList from "@/components/general/sales/sales-car-list";
+import React from "react";
 
 const CarSalesPage = () => {
   return (
     <div>
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem quaerat quas, expedita repellat nemo delectus corporis numquam ea voluptatum in optio. Accusantium, maiores autem? Iure deserunt quam porro suscipit sapiente.
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatem quaerat quas, expedita repellat nemo delectus corporis numquam ea voluptatum in optio. Accusantium, maiores autem? Iure deserunt quam porro suscipit sapiente.
+      <SalesCarList />
     </div>
-  )
-}
+  );
+};
 
-export default CarSalesPage
+export default CarSalesPage;
