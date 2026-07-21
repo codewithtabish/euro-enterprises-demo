@@ -7,110 +7,146 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────
+
 enum BlogStatus {
   DRAFT
   PUBLISHED
   SCHEDULED
 }
 
-model Blog {
-  id                  String      @id @default(cuid())
-
-  // Content
-  title               String
-  slug                String      @unique
-  shortDescription    String
-  content             Json      @db.Json
-
-  // Images
-  bannerImage         String
-  bannerImageAlt      String
-
-  // Publishing
-  status              BlogStatus  @default(DRAFT)
-  featured            Boolean     @default(false)
-  publishedAt         DateTime?
-
-  // Extra Content
-  tableOfContents     Json?
-
-
-
-  // SEO (1:1)
-  seo                 BlogSEO?
-
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-}
-
-model BlogSEO {
-  id                  String      @id @default(cuid())
-
-  blogId              String      @unique
-  blog                Blog        @relation(fields: [blogId], references: [id], onDelete: Cascade)
-
-  // Search Engine
-  metaTitle           String
-  metaDescription     String      @db.Text
-  canonicalUrl        String?
-
-  noIndex             Boolean     @default(false)
-  noFollow            Boolean     @default(false)
-
-  // Open Graph
-  ogTitle             String?
-  ogDescription       String?     @db.Text
-  ogImage             String?
-
-  // Twitter / X
-  twitterTitle        String?
-  twitterDescription  String?     @db.Text
-  twitterImage        String?
-
-  // Structured Data
-  schemaType          String      @default("Article")
-
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-}
-
-
 enum UserRole {
   ADMIN
   USER
 }
 
+enum FuelType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+}
+
+enum Transmission {
+  AUTOMATIC
+  MANUAL
+}
+
+enum InquiryStatus {
+  PENDING
+  CONTACTED
+  COMPLETED
+  CANCELLED
+}
+
+enum NotificationType {
+  INQUIRY_UPDATE
+  REVIEW_APPROVED
+  NEW_CAR
+  SYSTEM
+}
+
+// ─────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────
+
+model Blog {
+  id               String     @id @default(cuid())
+
+  // Content
+  title            String
+  slug             String     @unique
+  shortDescription String
+  content          Json       @db.Json
+
+  // Images
+  bannerImage      String
+  bannerImageAlt   String
+
+  // Publishing
+  status           BlogStatus @default(DRAFT)
+  featured         Boolean    @default(false)
+  publishedAt      DateTime?
+
+  // Extra Content
+  tableOfContents  Json?
+
+  // SEO (1:1)
+  seo              BlogSEO?
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model BlogSEO {
+  id                 String   @id @default(cuid())
+
+  blogId             String   @unique
+  blog               Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+
+  // Search Engine
+  metaTitle          String
+  metaDescription    String   @db.Text
+  canonicalUrl       String?
+
+  noIndex            Boolean  @default(false)
+  noFollow           Boolean  @default(false)
+
+  // Open Graph
+  ogTitle            String?
+  ogDescription      String?  @db.Text
+  ogImage            String?
+
+  // Twitter / X
+  twitterTitle       String?
+  twitterDescription String?  @db.Text
+  twitterImage       String?
+
+  // Structured Data
+  schemaType         String   @default("Article")
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 model User {
-  id          String     @id @default(cuid())
+  id String @id @default(cuid())
 
   // Clerk
-  clerkId     String     @unique
+  clerkId String @unique
 
   // Personal Information
-  firstName   String?
-  lastName    String?
-  fullName    String?
+  firstName String?
+  lastName  String?
+  fullName  String?
 
-  email       String     @unique
-  phone       String?    @unique
+  email String @unique
+  phone String? @unique
 
   // Profile
-  avatar       String?
+  avatar String?
 
   // Location
-  country      String?
-  city         String?
+  country String?
+  city    String?
+
   // Activity
-  lastLoginAt  DateTime?
-  lastSeenAt   DateTime?
+  lastLoginAt DateTime?
+  lastSeenAt  DateTime?
 
   // Authorization
-  role         UserRole  @default(USER)
+  role UserRole @default(USER)
 
+  // Relations
+  bookmarks     CarBookmark[]
+  reviews       CarReview[]
+  inquiries     CarInquiry[]
+  notifications Notification[]
 
-  // Timestamps
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([clerkId])
   @@index([email])
@@ -119,3 +155,175 @@ model User {
   @@index([city])
 }
 
+model SaleCar {
+  id String @id @default(cuid())
+
+  // Basic Information
+  title      String
+  slug       String @unique
+  coverImage String
+
+  brand String
+  model String
+  year  Int
+
+  // Pricing
+  price    Float
+  currency String @default("PKR")
+
+  // Vehicle Information
+  mileage      Int?
+  fuelType     FuelType?
+  transmission Transmission?
+  engine       String?
+  color        String?
+  registration String?
+
+  // Description
+  description Json @db.Json
+
+  // Images
+  images CarImage[]
+
+  // SEO (1:1)
+  seo SaleCarSEO?
+
+  // Status
+  isAvailable Boolean @default(true)
+
+  // Analytics
+  views Int @default(0)
+
+  // Customer Actions
+  bookmarks CarBookmark[]
+  inquiries CarInquiry[]
+  reviews   CarReview[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brand])
+  @@index([model])
+  @@index([year])
+  @@index([isAvailable])
+}
+
+model SaleCarSEO {
+  id                 String   @id @default(cuid())
+
+  saleCarId          String   @unique
+  saleCar            SaleCar  @relation(fields: [saleCarId], references: [id], onDelete: Cascade)
+
+  // Search Engine
+  metaTitle          String
+  metaDescription    String   @db.Text
+  canonicalUrl       String?
+
+  noIndex            Boolean  @default(false)
+  noFollow           Boolean  @default(false)
+
+  // Open Graph
+  ogTitle            String?
+  ogDescription      String?  @db.Text
+  ogImage            String?
+
+  // Twitter / X
+  twitterTitle       String?
+  twitterDescription String?  @db.Text
+  twitterImage       String?
+
+  // Structured Data
+  schemaType         String   @default("Article")
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model CarImage {
+  id String @id @default(cuid())
+
+  url String
+  alt String?
+
+  carId String
+  car   SaleCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model CarBookmark {
+  id String @id @default(cuid())
+
+  userId String
+  carId  String
+
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  car  SaleCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, carId])
+}
+
+model CarInquiry {
+  id String @id @default(cuid())
+
+  carId  String
+  userId String?
+
+  name    String
+  email   String?
+  phone   String
+  message String
+
+  status InquiryStatus @default(PENDING)
+
+  car  SaleCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+  user User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model CarReview {
+  id String @id @default(cuid())
+
+  carId  String
+  userId String
+
+  rating  Int
+  comment String
+
+  approved Boolean @default(false)
+
+  car  SaleCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([approved])
+}
+
+model Notification {
+  id String @id @default(cuid())
+
+  userId String
+
+  title   String
+  message String
+
+  type NotificationType
+
+  isRead Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+}

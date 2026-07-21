@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import Image from "next/image"
+import * as React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
-import { NavUser } from "@/components/nav-user"
+import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -14,17 +14,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
-} from "@/components/ui/sidebar"
-import { Separator } from "@/components/ui/separator"
-import { 
-  LayoutDashboardIcon, 
-  BookOpenIcon, 
-  CalendarCheckIcon, 
-  HomeIcon, 
-  UsersIcon 
-} from "lucide-react"
-import Logo from "@/assets/logo/logo"
-import { BrandLogo } from "./dashboard/brand-logo-text"
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import {
+  LayoutDashboardIcon,
+  BookOpenIcon,
+  CalendarCheckIcon,
+  HomeIcon,
+  UsersIcon,
+} from "lucide-react";
+import Logo from "@/assets/logo/logo";
+import { BrandLogo } from "./dashboard/brand-logo-text";
 
 const data = {
   user: {
@@ -42,6 +42,12 @@ const data = {
     {
       title: "Blogs",
       url: "/dashboard/blogs",
+      icon: BookOpenIcon,
+      isActive: false,
+    },
+    {
+      title: "Sales",
+      url: "/dashboard/sales",
       icon: BookOpenIcon,
       isActive: false,
     },
@@ -64,15 +70,14 @@ const data = {
       isActive: false,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="p-5">
         <SidebarMenu>
-              <BrandLogo/>
-          
+          <BrandLogo />
         </SidebarMenu>
       </SidebarHeader>
 
@@ -86,26 +91,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton
                   className={`
                     group relative flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-300 ease-out w-full
-                    ${item.isActive 
-                      ? "bg-primary/10 text-primary shadow-[0_2px_8px_rgba(var(--primary),0.15)] border border-primary/20" 
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-sm"
+                    ${
+                      item.isActive
+                        ? "bg-primary/10 text-primary shadow-[0_2px_8px_rgba(var(--primary),0.15)] border border-primary/20"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:shadow-sm"
                     }
                   `}
                 >
-                  <Link href={item.url} className="flex items-center gap-3 w-full">
+                  <Link
+                    href={item.url}
+                    className="flex items-center gap-3 w-full"
+                  >
                     {item.isActive && (
                       <span className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-l-full bg-primary shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
                     )}
-                    <div className={`
+                    <div
+                      className={`
                       flex size-9 items-center justify-center rounded-lg transition-all duration-300 shrink-0
-                      ${item.isActive 
-                        ? "bg-primary/15 text-primary scale-110" 
-                        : "bg-muted text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground group-hover:scale-105"
+                      ${
+                        item.isActive
+                          ? "bg-primary/15 text-primary scale-110"
+                          : "bg-muted text-muted-foreground group-hover:bg-accent group-hover:text-accent-foreground group-hover:scale-105"
                       }
-                    `}>
+                    `}
+                    >
                       <item.icon className="size-5" />
                     </div>
-                    <span className={item.isActive ? "text-primary font-semibold" : "group-hover:font-medium"}>
+                    <span
+                      className={
+                        item.isActive
+                          ? "text-primary font-semibold"
+                          : "group-hover:font-medium"
+                      }
+                    >
                       {item.title}
                     </span>
                     {item.isActive && (
@@ -126,5 +144,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

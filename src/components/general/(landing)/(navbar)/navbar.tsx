@@ -1,66 +1,53 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import React, { useState } from 'react';
-import { Menu, X, ChevronDown, LayoutDashboard, Calendar } from 'lucide-react';
-import { ModeToggle } from '../../(themes)/theme-toggler';
-import {
-  Show,
-  SignInButton,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
-import NavBarLogo from './navbar-logo';
-import { usePathname } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import React, { useState } from "react";
+import { ChevronDown, LayoutDashboard, Calendar } from "lucide-react";
+import { ModeToggle } from "../../(themes)/theme-toggler";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
+import NavBarLogo from "./navbar-logo";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
-  { name: 'Cars', href: '#', hasDropdown: true },
-  { name: 'Blogs', href: '/blogs' },
-  { name: 'Teams', href: '/teams' },
-  { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact-us' },
+  { name: "Cars", href: "#", hasDropdown: true },
+  { name: "Blogs", href: "/blogs" },
+  { name: "Teams", href: "/teams" },
+  { name: "About", href: "/about" },
+  { name: "Contact", href: "/contact-us" },
 ];
 
 const carSubmenu = [
-  { name: 'Rentals', href: '/cars/rental' },
-  { name: 'Sales', href: '/cars/sales' },
+  { name: "Rentals", href: "/cars/rental" },
+  { name: "Sales", href: "/cars/sales" },
 ];
 
 // ─── Multiple Admin Emails ─────────────────────────────────────
-const ADMIN_EMAILS = [
-  "info@euroenterprises.rent",
-  "alii.9000919@gmail.com",
-];
+// const ADMIN_EMAILS = ["info@euroenterprises.rent", "alii.9000919@gmail.com"];
 
 // ─── UserMenu Component (DECLARED OUTSIDE) ─────────────────────
 function UserMenu() {
-  const { user } = useUser();
+  // const { user } = useUser();
 
-  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
-
-
-
-
+  // const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  // const isAdmin = userEmail ? ADMIN_EMAILS.includes(userEmail) : false;
 
   return (
     <UserButton
       appearance={{
         elements: {
-          avatarBox: "h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-border hover:ring-primary/50 transition-all",
+          avatarBox:
+            "h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-border hover:ring-primary/50 transition-all",
         },
       }}
     >
       <UserButton.MenuItems>
         {/* Dashboard - ONLY for admins */}
-        {isAdmin && (
-          <UserButton.Link
-            label="Dashboard"
-            labelIcon={<LayoutDashboard className="h-4 w-4" />}
-            href="/dashboard"
-          />
-        )}
+        <UserButton.Link
+          label="Dashboard"
+          labelIcon={<LayoutDashboard className="h-4 w-4" />}
+          href="/dashboard"
+        />
 
         {/* My Bookings - for EVERYONE logged in */}
         <UserButton.Link
@@ -87,15 +74,21 @@ function BookingIcon() {
 }
 
 // ─── MobileDropdownButton Component ────────────────────────────
-function MobileDropdownButton({ menuState, setMenuState }: { menuState: boolean; setMenuState: (v: boolean) => void }) {
+function MobileDropdownButton({
+  menuState,
+  setMenuState,
+}: {
+  menuState: boolean;
+  setMenuState: (v: boolean) => void;
+}) {
   return (
     <button
       onClick={() => setMenuState(!menuState)}
-      aria-label={menuState ? 'Close Menu' : 'Open Menu'}
+      aria-label={menuState ? "Close Menu" : "Open Menu"}
       className="relative z-50 p-2 text-foreground hover:bg-accent rounded-xl transition-colors"
     >
-      <ChevronDown 
-        className={`size-5 transition-all duration-300 ${menuState ? 'rotate-180' : ''}`} 
+      <ChevronDown
+        className={`size-5 transition-all duration-300 ${menuState ? "rotate-180" : ""}`}
       />
     </button>
   );
@@ -107,7 +100,8 @@ const APPNavBar = () => {
   const pathname = usePathname();
 
   // ✅ HIDE on dashboard AND on any blog detail page (/blogs/[slug])
-  const shouldHide = pathname.startsWith("/dashboard") || pathname.startsWith("/blogs/");
+  const shouldHide =
+    pathname.startsWith("/dashboard") || pathname.startsWith("/blogs/");
 
   if (shouldHide) {
     return null;
@@ -116,12 +110,11 @@ const APPNavBar = () => {
   return (
     <header className="sticky top-0 z-50 w-full">
       <nav
-        data-state={menuState ? 'active' : undefined}
+        data-state={menuState ? "active" : undefined}
         className="border-b border-border bg-white/95 backdrop-blur-lg dark:bg-zinc-950/95 transition-all duration-300"
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
-
             {/* Logo - DESKTOP ONLY (hidden on mobile) */}
             <div className="hidden lg:block">
               <NavBarLogo />
@@ -140,7 +133,7 @@ const APPNavBar = () => {
                     >
                       {item.name}
                       <ChevronDown
-                        className={`size-4 transition-transform duration-200 ${carsOpen ? 'rotate-180' : ''}`}
+                        className={`size-4 transition-transform duration-200 ${carsOpen ? "rotate-180" : ""}`}
                       />
                     </button>
                   ) : (
@@ -176,7 +169,6 @@ const APPNavBar = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
-
               {/* Mode Toggle - ALWAYS visible */}
               <ModeToggle />
 
@@ -184,7 +176,10 @@ const APPNavBar = () => {
               <div className="hidden lg:flex items-center gap-3">
                 <Show when="signed-out">
                   <SignInButton mode="modal">
-                    <Button className={'md:px-5 px-4 md:py-6 py-4 cursor-pointer'} variant={'secondary'}>
+                    <Button
+                      className={"md:px-5 px-4 md:py-6 py-4 cursor-pointer"}
+                      variant={"secondary"}
+                    >
                       Get Started
                     </Button>
                   </SignInButton>
@@ -204,13 +199,19 @@ const APPNavBar = () => {
                       <span className="text-xs font-medium">Log in</span>
                     </Button>
                   </SignInButton>
-                  <MobileDropdownButton menuState={menuState} setMenuState={setMenuState} />
+                  <MobileDropdownButton
+                    menuState={menuState}
+                    setMenuState={setMenuState}
+                  />
                 </Show>
 
                 <Show when="signed-in">
                   <BookingIcon />
                   <UserMenu />
-                  <MobileDropdownButton menuState={menuState} setMenuState={setMenuState} />
+                  <MobileDropdownButton
+                    menuState={menuState}
+                    setMenuState={setMenuState}
+                  />
                 </Show>
               </div>
             </div>
@@ -219,14 +220,19 @@ const APPNavBar = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6 shadow-xl transition-all duration-300 overflow-hidden ${menuState ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}
+          className={`lg:hidden border-t border-border bg-white dark:bg-zinc-950 px-6 shadow-xl transition-all duration-300 overflow-hidden ${menuState ? "max-h-screen opacity-100" : "max-h-0 opacity-0 pointer-events-none"}`}
         >
           <ul className="space-y-6 text-base font-medium py-6">
             {menuItems.map((item, index) => (
-              <li key={index} className="border-b border-border last:border-0 pb-6 last:pb-0">
+              <li
+                key={index}
+                className="border-b border-border last:border-0 pb-6 last:pb-0"
+              >
                 {item.hasDropdown ? (
                   <div>
-                    <div className="font-semibold text-foreground mb-4">Cars</div>
+                    <div className="font-semibold text-foreground mb-4">
+                      Cars
+                    </div>
                     <div className="pl-6 space-y-5">
                       {carSubmenu.map((sub, subIndex) => (
                         <Link
