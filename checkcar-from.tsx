@@ -8,7 +8,6 @@ import { createCarAction } from "@/app/actions/sales_car_creation";
 import { getPresignedUrl } from "@/app/actions/upload-image";
 import { generateUniqueSlug } from "@/lib/slugify";
 import { toast, Toaster } from "sonner";
-import { useRouter } from "next/navigation";
 
 import {
   Car,
@@ -33,7 +32,6 @@ import {
   CheckCircle,
   ChevronDown,
   Share2,
-  Eye,
 } from "lucide-react";
 import Image from "next/image";
 import CarEditor from "./sale-car-editor";
@@ -65,7 +63,6 @@ interface UploadingFile {
 // MAIN CAR FORM COMPONENT
 // ============================================
 export const CarFormComp = () => {
-  const router = useRouter();
   const [editorContent, setEditorContent] = useState<{ blocks: any[] }>({
     blocks: [],
   });
@@ -176,27 +173,6 @@ export const CarFormComp = () => {
     watchedOgImage,
     files,
   ]);
-
-  // ============================================
-  // PREVIEW HANDLER
-  // ============================================
-
-  const handlePreview = useCallback(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem(
-        "car_preview_content",
-        JSON.stringify({
-          content: editorContent,
-        }),
-      );
-    }
-
-    window.open("/dashboard/sales/preview", "_blank");
-
-    toast.success("Opening preview...", {
-      icon: <Eye className="h-4 w-4 text-blue-500" />,
-    });
-  }, [editorContent]);
 
   // ============================================
   // SLUG GENERATOR
@@ -505,6 +481,20 @@ export const CarFormComp = () => {
     [editorContent, reset, areRequiredFieldsFilled, trigger],
   );
 
+  const handlePreview = useCallback(async () => {
+    let editorData;
+
+    const previewPayload = {
+      content: editorData,
+    };
+
+    sessionStorage.setItem(
+      "blog_preview_content",
+      JSON.stringify(previewPayload),
+    );
+    window.open("/dashboard/sales/preview", "_blank");
+  }, [editorContent]);
+
   const hasContent = editorContent?.blocks?.length > 0;
   const uploadedCount = files.filter(
     (f) => f.type === "gallery" && f.status === "done",
@@ -569,24 +559,14 @@ export const CarFormComp = () => {
         })}
         className="space-y-8 max-w-5xl mx-auto p-6 md:p-8 rounded-2xl bg-card border shadow-sm"
       >
-        {/* Header with Preview Button */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="text-center space-y-2 flex-1">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              List Your Car
-            </h2>
-            <p className="text-muted-foreground text-sm">
-              Fill in the details below to create your car listing
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handlePreview}
-            className="shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 active:scale-95 transition-all duration-200 shadow-sm"
-          >
-            <Eye className="h-4 w-4" />
-            Preview
-          </button>
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+            List Your Car
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Fill in the details below to create your car listing
+          </p>
         </div>
 
         {/* Availability Toggle */}

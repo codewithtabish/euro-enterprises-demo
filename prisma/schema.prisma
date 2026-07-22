@@ -163,6 +163,15 @@ model SaleCar {
   slug       String @unique
   coverImage String
 
+// i wanat lieke here keep for each reataion the add
+// anothe rone filed too 
+  // and for faeayiures this too 
+
+
+
+  
+
+
   brand String
   model String
   year  Int

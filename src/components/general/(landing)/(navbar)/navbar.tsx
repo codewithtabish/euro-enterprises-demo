@@ -8,6 +8,7 @@ import { ModeToggle } from "../../(themes)/theme-toggler";
 import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import NavBarLogo from "./navbar-logo";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const menuItems = [
   { name: "Cars", href: "#", hasDropdown: true },
@@ -117,7 +118,15 @@ const APPNavBar = () => {
           <div className="flex items-center justify-between gap-6 py-4 lg:py-5">
             {/* Logo - DESKTOP ONLY (hidden on mobile) */}
             <div className="hidden lg:block">
-              <NavBarLogo />
+              <Image
+                className="object-contain bg-red-600 h-20"
+                src="/logos/watermark.png"
+                alt="EURO ENTERPRISES Watermark"
+                width={220}
+                height={90}
+                priority
+              />{" "}
+              {/* <NavBarLogo /> */}
             </div>
 
             {/* Desktop Navigation */}

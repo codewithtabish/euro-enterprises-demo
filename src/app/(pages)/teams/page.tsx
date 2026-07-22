@@ -1,12 +1,14 @@
-import TeamSection from '@/components/general/(team)/team-section'
-import React from 'react'
+import WatermarkedImageUploader from "@/components/general/(team)/check-upload-image";
+import TeamSection from "@/components/general/(team)/team-section";
+import React from "react";
 
-const OurTeamPage = () => {
+const OurTeamPage = (props) => {
   return (
     <div>
-      <TeamSection/>
+      <WatermarkedImageUploader />
+      <TeamSection />
     </div>
-  )
-}
+  );
+};
 
-export default OurTeamPage
+export default OurTeamPage;
