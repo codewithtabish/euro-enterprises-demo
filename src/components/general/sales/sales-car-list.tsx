@@ -3,13 +3,11 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
-  Eye,
-  Heart,
   ArrowRight,
   Search,
-  SlidersHorizontal,
   X,
   Car,
   AlertCircle,
@@ -17,6 +15,15 @@ import {
   Calendar,
   ArrowUp,
   ArrowDown,
+  LayoutGrid,
+  List,
+  Gauge,
+  Fuel,
+  Settings2,
+  Bookmark,
+  Eye,
+  Zap,
+  Shield,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -31,12 +38,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Toggle } from "@/components/ui/toggle";
+import { Separator } from "@/components/ui/separator";
 
 /* ─────────────────────────────────────────────
    TYPES
    ───────────────────────────────────────────── */
 
-interface CarData {
+export interface SaleCarSEO {
+  metaTitle: string;
+  metaDescription: string;
+  canonicalUrl: string | null;
+  noIndex: boolean;
+  noFollow: boolean;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+  schemaType: string;
+}
+
+export interface CarImage {
+  id: string;
+  createdAt: Date;
+  url: string;
+  alt: string | null;
+  carId: string;
+}
+
+export interface CarData {
   id: string;
   slug: string;
   coverImage: string;
@@ -46,20 +78,32 @@ interface CarData {
   title: string;
   price: number;
   currency: string;
-  views: number;
   isAvailable: boolean;
-  _count?: { bookmarks?: number };
+  fuelType?: string;
+  transmission?: string;
+  mileage?: number | null;
+  color?: string;
+  engine?: string;
+  registration?: string;
+  description?: unknown;
+  images?: CarImage[];
+  seo?: SaleCarSEO;
+  views?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-interface SaleCarsResult {
+export interface SaleCarsResult {
   success: boolean;
   data?: CarData[];
   count?: number;
   error?: string;
 }
 
+type ViewMode = "grid" | "list";
+
 /* ─────────────────────────────────────────────
-   ANIMATION VARIANTS (Fixed ease type)
+   ANIMATION VARIANTS
    ───────────────────────────────────────────── */
 
 const containerVariants: Variants = {
@@ -71,18 +115,32 @@ const containerVariants: Variants = {
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 30, scale: 0.96 },
+  hidden: { opacity: 0, y: 28, scale: 0.96 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.45, ease: "easeOut" },
+    transition: { duration: 0.5, ease: "easeOut" },
   },
   exit: {
     opacity: 0,
-    y: -15,
+    y: -16,
     scale: 0.95,
-    transition: { duration: 0.25, ease: "easeIn" },
+    transition: { duration: 0.22, ease: "easeIn" },
+  },
+};
+
+const listItemVariants: Variants = {
+  hidden: { opacity: 0, x: -20 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    x: 20,
+    transition: { duration: 0.2, ease: "easeIn" },
   },
 };
 
@@ -96,14 +154,41 @@ const headerVariants: Variants = {
 };
 
 const searchBarVariants: Variants = {
-  hidden: { opacity: 0, y: -10, scale: 0.98 },
+  hidden: { opacity: 0, y: -10, scale: 0.97 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.5, delay: 0.2, ease: "easeOut" },
+    transition: { duration: 0.5, delay: 0.15, ease: "easeOut" },
   },
 };
+
+/* ─────────────────────────────────────────────
+   UTILITY
+   ───────────────────────────────────────────── */
+
+function getCleanDescription(car: CarData): string | null {
+  if (car.seo?.metaDescription && car.seo.metaDescription.length > 10) {
+    return car.seo.metaDescription;
+  }
+  if (car.registration || car.engine) {
+    const parts: string[] = [];
+    if (car.registration) parts.push(`Registered ${car.registration}`);
+    if (car.engine) parts.push(car.engine);
+    if (parts.length) return parts.join(" · ");
+  }
+  if (car.mileage || car.fuelType) {
+    const parts: string[] = [];
+    if (car.mileage) parts.push(`${car.mileage.toLocaleString()} km`);
+    if (car.fuelType) parts.push(car.fuelType);
+    if (parts.length) return parts.join(" · ");
+  }
+  return null;
+}
+
+function formatPrice(price: number, currency: string): string {
+  return `${currency} ${price.toLocaleString()}`;
+}
 
 /* ─────────────────────────────────────────────
    ERROR STATE
@@ -112,40 +197,30 @@ const searchBarVariants: Variants = {
 function ErrorState({ error }: { error?: string }) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="py-20 lg:py-32"
+      transition={{ duration: 0.4 }}
+      className="py-20 lg:py-28"
     >
       <div className="mx-auto w-[min(1200px,92%)]">
-        <Card className="border-destructive/20 overflow-hidden">
-          <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-5 p-12 text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{
-                type: "spring",
-                stiffness: 200,
-                damping: 15,
-                delay: 0.1,
-              }}
-              className="rounded-full bg-destructive/10 p-5"
-            >
+        <Card className="border-destructive/15 bg-destructive/[0.02]">
+          <CardContent className="flex min-h-[360px] flex-col items-center justify-center gap-5 px-10 text-center">
+            <div className="rounded-full bg-destructive/10 p-5">
               <AlertCircle className="h-10 w-10 text-destructive" />
-            </motion.div>
+            </div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-destructive">
                 Failed to load cars
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground max-w-sm">
                 {error || "Please try again later."}
               </p>
             </div>
             <Button
               variant="outline"
-              size="default"
+              size="sm"
               onClick={() => window.location.reload()}
-              className="mt-2 rounded-full px-6"
+              className="mt-2 rounded-full px-6 py-2.5"
             >
               Retry
             </Button>
@@ -169,29 +244,24 @@ function EmptyState({
 }) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="py-20 lg:py-32"
+      transition={{ duration: 0.4 }}
+      className="py-20 lg:py-28"
     >
       <div className="mx-auto w-[min(1200px,92%)]">
-        <Card className="border-dashed border-muted-foreground/20">
-          <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-5 p-12 text-center">
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="rounded-full bg-muted p-6"
-            >
-              <Car className="h-12 w-12 text-muted-foreground/60" />
-            </motion.div>
+        <Card className="border-dashed border-muted-foreground/20 bg-muted/20">
+          <CardContent className="flex min-h-[360px] flex-col items-center justify-center gap-5 p-10 text-center">
+            <div className="rounded-full bg-muted p-6">
+              <Car className="h-12 w-12 text-muted-foreground/40" />
+            </div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold">
                 {searchQuery ? "No matches found" : "No cars available"}
               </h3>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+              <p className="text-sm text-muted-foreground max-w-sm">
                 {searchQuery
-                  ? `No cars match "${searchQuery}". Try a different search term.`
+                  ? `No cars match "${searchQuery}". Try a different search.`
                   : "Check back later for new listings."}
               </p>
             </div>
@@ -200,7 +270,7 @@ function EmptyState({
                 variant="outline"
                 size="sm"
                 onClick={onClear}
-                className="mt-1 rounded-full"
+                className="mt-2 rounded-full px-5"
               >
                 <X className="mr-1.5 h-3.5 w-3.5" />
                 Clear search
@@ -214,11 +284,12 @@ function EmptyState({
 }
 
 /* ─────────────────────────────────────────────
-   CAR CARD
+   GRID CAR CARD
    ───────────────────────────────────────────── */
 
-function CarCard({ car, index }: { car: CarData; index: number }) {
+function GridCarCard({ car, index }: { car: CarData; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
+  const description = getCleanDescription(car);
 
   return (
     <motion.div
@@ -230,39 +301,37 @@ function CarCard({ car, index }: { car: CarData; index: number }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/cars-for-sale/${car.slug}`} className="block h-full">
-        <Card className="group relative flex h-full flex-col overflow-hidden border-border/40 bg-card transition-all duration-500 hover:border-primary/25 hover:shadow-2xl hover:shadow-primary/[0.07] pt-0 dark:hover:shadow-primary/[0.12] hover:-translate-y-1">
-          {/* ── Image ── */}
-          <div className="relative aspect-4/3 overflow-hidden bg-muted">
+      <Link href={`/cars/sales/${car.slug}`} className="block h-full">
+        <Card className="group relative flex h-full flex-col pt-0 overflow-hidden border-border/40 bg-card transition-all duration-500 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/[0.07] dark:hover:shadow-primary/[0.12] hover:-translate-y-1 rounded-2xl">
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden bg-muted">
             <Image
               src={car.coverImage}
               alt={`${car.brand} ${car.model}`}
               fill
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              className="object-cover transition-all duration-700 ease-out group-hover:scale-110"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={index < 4}
             />
 
-            {/* Gradient overlay on hover */}
             <motion.div
-              className="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.35 }}
+              className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"
+              initial={{ opacity: 0.3 }}
+              animate={{ opacity: isHovered ? 0.85 : 0.3 }}
+              transition={{ duration: 0.4 }}
             />
 
-            {/* Sold Badge */}
             <AnimatePresence>
               {!car.isAvailable && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md"
                 >
                   <Badge
                     variant="destructive"
-                    className="px-6 py-2.5 text-sm font-bold shadow-2xl tracking-wide"
+                    className="px-6 py-2.5 text-sm font-bold shadow-2xl tracking-wider"
                   >
                     SOLD
                   </Badge>
@@ -270,75 +339,359 @@ function CarCard({ car, index }: { car: CarData; index: number }) {
               )}
             </AnimatePresence>
 
-            {/* Year Badge - Top Left */}
-            <motion.div
-              className="absolute left-3 top-3"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + index * 0.05 }}
-            >
+            {/* Badges */}
+            <div className="absolute left-3 top-3 flex items-center gap-2">
               <Badge
                 variant="secondary"
-                className="bg-black/50 text-white backdrop-blur-xl border-0 hover:bg-black/50 text-xs font-semibold px-3 py-1"
+                className="bg-black/50 text-white backdrop-blur-xl border-0 text-[11px] font-bold px-3 py-1 rounded-lg"
               >
                 {car.year}
               </Badge>
-            </motion.div>
-
-            {/* Price Badge - Bottom Right */}
-            <motion.div
-              className="absolute bottom-3 right-3"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 + index * 0.05 }}
-            >
               <Badge
                 variant="secondary"
-                className="bg-background/95 text-foreground backdrop-blur-xl border-0 shadow-xl hover:bg-background/95 text-sm font-bold px-4 py-2"
+                className="bg-primary/90 text-primary-foreground backdrop-blur-xl border-0 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider"
               >
-                {car.currency} {car.price.toLocaleString()}
+                {car.brand}
               </Badge>
-            </motion.div>
+            </div>
 
-            {/* Hover CTA Button */}
-            <AnimatePresence>
-              {isHovered && car.isAvailable && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.85, y: 10 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="absolute inset-0 flex items-center justify-center"
+            {car.views !== undefined && car.views > 0 && (
+              <div className="absolute right-3 top-3">
+                <Badge
+                  variant="secondary"
+                  className="bg-black/40 text-white/90 backdrop-blur-xl border-0 text-[10px] font-medium px-2.5 py-1 rounded-lg flex items-center gap-1"
                 >
-                  <Button
-                    size="default"
-                    className="gap-2.5 rounded-full bg-background/95 text-foreground shadow-2xl backdrop-blur-xl border border-border/20 hover:bg-background px-6 py-3 text-sm font-semibold"
+                  <Eye className="h-3 w-3" />
+                  {car.views > 999
+                    ? `${(car.views / 1000).toFixed(1)}k`
+                    : car.views}
+                </Badge>
+              </div>
+            )}
+
+            {/* Price */}
+            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+              <motion.div
+                initial={{ y: 0 }}
+                animate={{ y: isHovered ? -4 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Badge
+                  variant="secondary"
+                  className="bg-background/95 text-foreground backdrop-blur-xl border-0 shadow-2xl text-base font-bold px-4 py-2 rounded-xl"
+                >
+                  {formatPrice(car.price, car.currency)}
+                </Badge>
+              </motion.div>
+
+              <AnimatePresence>
+                {isHovered && car.isAvailable && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex items-center gap-1.5"
                   >
-                    View Details
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
+                    {car.fuelType && (
+                      <Badge className="bg-white/20 text-white backdrop-blur-xl border-0 text-[10px] font-medium px-2 py-1 rounded-lg">
+                        <Fuel className="h-2.5 w-2.5 mr-1" />
+                        {car.fuelType}
+                      </Badge>
+                    )}
+                    {car.transmission && (
+                      <Badge className="bg-white/20 text-white backdrop-blur-xl border-0 text-[10px] font-medium px-2 py-1 rounded-lg">
+                        <Settings2 className="h-2.5 w-2.5 mr-1" />
+                        {car.transmission}
+                      </Badge>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Content */}
+          <CardContent className="flex flex-1 flex-col p-5">
+            <div className="flex-1 space-y-3">
+              <h3 className="text-[15px] font-bold leading-snug text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                {car.title}
+              </h3>
+
+              {description && (
+                <p className="text-[12px] leading-relaxed text-muted-foreground/80 line-clamp-2">
+                  {description}
+                </p>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {car.mileage !== null && car.mileage !== undefined && (
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70 bg-muted/60 px-2 py-1 rounded-md">
+                    <Gauge className="h-3 w-3 text-primary/70" />
+                    {car.mileage.toLocaleString()} km
+                  </div>
+                )}
+                {car.color && (
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70 bg-muted/60 px-2 py-1 rounded-md">
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full border border-border/50"
+                      style={{ backgroundColor: car.color.toLowerCase() }}
+                    />
+                    {car.color}
+                  </div>
+                )}
+                {car.engine && (
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70 bg-muted/60 px-2 py-1 rounded-md">
+                    <Zap className="h-3 w-3 text-primary/70" />
+                    {car.engine}
+                  </div>
+                )}
+                {car.registration && (
+                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground/70 bg-muted/60 px-2 py-1 rounded-md">
+                    <Shield className="h-3 w-3 text-primary/70" />
+                    {car.registration}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-border/20 flex items-center justify-between">
+              <span className="text-xs text-muted-foreground/60 font-medium">
+                {car.model}
+              </span>
+              {car.isAvailable ? (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-semibold border-emerald-500/30 text-emerald-600 bg-emerald-500/10 px-2.5 py-0.5 rounded-full"
+                >
+                  Available
+                </Badge>
+              ) : (
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-semibold border-red-500/30 text-red-600 bg-red-500/10 px-2.5 py-0.5 rounded-full"
+                >
+                  Sold
+                </Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+    </motion.div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   LIST CAR CARD
+   ───────────────────────────────────────────── */
+
+function ListCarCard({ car, index }: { car: CarData; index: number }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+  const description = getCleanDescription(car);
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/save/${car.slug}`);
+  };
+
+  const specs = [
+    car.fuelType && {
+      icon: <Fuel className="h-3.5 w-3.5" />,
+      label: car.fuelType,
+    },
+    car.transmission && {
+      icon: <Settings2 className="h-3.5 w-3.5" />,
+      label: car.transmission,
+    },
+    car.mileage !== null &&
+      car.mileage !== undefined && {
+        icon: <Gauge className="h-3.5 w-3.5" />,
+        label: `${car.mileage.toLocaleString()} km`,
+      },
+    car.color && {
+      icon: (
+        <span
+          className="inline-block h-3.5 w-3.5 rounded-full border border-border/60"
+          style={{ backgroundColor: car.color.toLowerCase() }}
+        />
+      ),
+      label: car.color,
+    },
+    car.engine && {
+      icon: <Zap className="h-3.5 w-3.5" />,
+      label: car.engine,
+    },
+    car.registration && {
+      icon: <Shield className="h-3.5 w-3.5" />,
+      label: `Reg: ${car.registration}`,
+    },
+  ].filter(Boolean) as { icon: React.ReactNode; label: string }[];
+
+  return (
+    <motion.div
+      layout
+      variants={listItemVariants}
+      initial="hidden"
+      animate="show"
+      exit="exit"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Link href={`/cars/sales/${car.slug}`} className="block">
+        <Card className="group relative flex flex-col sm:flex-row pt-0 overflow-hidden border-border/40 bg-card transition-all duration-500 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/[0.07] dark:hover:shadow-primary/[0.12] rounded-2xl">
+          {/* Image */}
+          <div className="relative w-full sm:w-72 lg:w-80 aspect-[16/10] sm:aspect-auto sm:min-h-[200px] shrink-0 overflow-hidden bg-muted">
+            <Image
+              src={car.coverImage}
+              alt={`${car.brand} ${car.model}`}
+              fill
+              className="object-cover transition-all duration-700 ease-out group-hover:scale-110"
+              sizes="(max-width: 640px) 100vw, 320px"
+              priority={index < 4}
+            />
+
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isHovered ? 0.6 : 0 }}
+              transition={{ duration: 0.4 }}
+            />
+
+            <AnimatePresence>
+              {!car.isAvailable && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-md"
+                >
+                  <Badge
+                    variant="destructive"
+                    className="px-6 py-2.5 text-sm font-bold shadow-2xl tracking-wider"
+                  >
+                    SOLD
+                  </Badge>
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
 
-          {/* ── Content ── */}
-          <CardContent className="flex flex-1 flex-col justify-between px-2">
-            <div>
-              <motion.p
-                className="text-[11px] font-bold uppercase tracking-[0.15em] text-primary"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 + index * 0.05 }}
+            <div className="absolute left-3 top-3 flex items-center gap-2">
+              <Badge
+                variant="secondary"
+                className="bg-black/50 text-white backdrop-blur-xl border-0 text-[11px] font-bold px-3 py-1 rounded-lg"
+              >
+                {car.year}
+              </Badge>
+              <Badge
+                variant="secondary"
+                className="bg-primary/90 text-primary-foreground backdrop-blur-xl border-0 text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wider"
               >
                 {car.brand}
-              </motion.p>
-              <h3 className="mt-1.5 text-lg font-bold leading-snug text-foreground truncate">
-                {car.title}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground font-medium">
-                {car.model}
-              </p>
+              </Badge>
+            </div>
+          </div>
+
+          {/* Content */}
+          <CardContent className="flex flex-1 flex-col justify-between p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0 space-y-2">
+                <h3 className="text-lg font-bold leading-snug text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                  {car.title}
+                </h3>
+
+                {description && (
+                  <p className="text-[13px] leading-relaxed text-muted-foreground/75 line-clamp-2">
+                    {description}
+                  </p>
+                )}
+
+                <p className="text-sm text-muted-foreground/60 font-medium">
+                  {car.model} · {car.year}
+                </p>
+
+                {specs.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {specs.map((spec, i) => (
+                      <Badge
+                        key={i}
+                        variant="outline"
+                        className="gap-1.5 bg-muted/50 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground hover:bg-muted/50 border-border/30 rounded-lg"
+                      >
+                        {spec.icon}
+                        {spec.label}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="hidden sm:flex flex-col items-end gap-3 shrink-0">
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary border-0 text-lg font-bold px-4 py-2 rounded-xl"
+                >
+                  {formatPrice(car.price, car.currency)}
+                </Badge>
+
+                <div className="flex items-center gap-2">
+                  {car.isAvailable ? (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-semibold border-emerald-500/30 text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full"
+                    >
+                      Available
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] font-semibold border-red-500/30 text-red-600 bg-red-500/10 px-2.5 py-1 rounded-full"
+                    >
+                      Sold
+                    </Badge>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleSave}
+                    className="h-9 w-9 rounded-full p-0 hover:bg-muted"
+                  >
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between pt-4 border-t border-border/20">
+              <div className="sm:hidden">
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/10 text-primary border-0 text-sm font-bold px-3 py-1.5 rounded-xl"
+                >
+                  {formatPrice(car.price, car.currency)}
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {car.views !== undefined && car.views > 0 && (
+                  <span className="flex items-center gap-1 text-[11px] text-muted-foreground/50">
+                    <Eye className="h-3 w-3" />
+                    {car.views > 999
+                      ? `${(car.views / 1000).toFixed(1)}k`
+                      : car.views}{" "}
+                    views
+                  </span>
+                )}
+                <Button
+                  size="sm"
+                  className="hidden sm:flex gap-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground border-0 transition-all duration-300 text-xs font-semibold px-5 py-2.5"
+                >
+                  View Details
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -356,6 +709,8 @@ function SearchFilterBar({
   setSearchQuery,
   sortBy,
   setSortBy,
+  viewMode,
+  setViewMode,
   totalCars,
   filteredCount,
 }: {
@@ -363,17 +718,18 @@ function SearchFilterBar({
   setSearchQuery: (q: string) => void;
   sortBy: string;
   setSortBy: (s: string) => void;
+  viewMode: ViewMode;
+  setViewMode: (v: ViewMode) => void;
   totalCars: number;
   filteredCount: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  // Auto-focus on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       inputRef.current?.focus();
-    }, 600);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -382,34 +738,37 @@ function SearchFilterBar({
     inputRef.current?.focus();
   }, [setSearchQuery]);
 
+  const handleSortChange = useCallback(
+    (value: string | null) => {
+      if (value) setSortBy(value);
+    },
+    [setSortBy],
+  );
+
   return (
     <motion.div
       variants={searchBarVariants}
       initial="hidden"
       animate="show"
-      className="mb-10 space-y-5"
+      className="mb-8 space-y-4"
     >
-      {/* ── Main Search Row ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Search Input - Takes most space */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <motion.div
           className="relative flex-1 max-w-2xl"
-          animate={{
-            scale: isFocused ? 1.01 : 1,
-          }}
+          animate={{ scale: isFocused ? 1.005 : 1 }}
           transition={{ duration: 0.2 }}
         >
           <div
-            className={`absolute inset-0 rounded-2xl transition-all duration-300 ${
+            className={`absolute -inset-0.5 rounded-xl transition-all duration-300 pointer-events-none ${
               isFocused
-                ? "bg-primary/5 shadow-lg shadow-primary/10"
-                : "bg-transparent"
+                ? "bg-primary/5 shadow-lg shadow-primary/8 ring-1 ring-primary/20"
+                : "bg-muted/40 shadow-sm ring-1 ring-border/50"
             }`}
           />
           <div className="relative flex items-center">
             <Search
-              className={`absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors duration-300 ${
-                isFocused ? "text-primary" : "text-muted-foreground/50"
+              className={`absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-300 ${
+                isFocused ? "text-primary" : "text-muted-foreground/40"
               }`}
             />
             <Input
@@ -420,7 +779,7 @@ function SearchFilterBar({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              className="h-14 pl-12 pr-12 rounded-2xl border-border/50 bg-card text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 text-base shadow-sm transition-all duration-300"
+              className="relative h-12 pl-10 pr-10 rounded-xl border-0 bg-transparent text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm shadow-none"
             />
             <AnimatePresence>
               {searchQuery && (
@@ -430,104 +789,99 @@ function SearchFilterBar({
                   exit={{ opacity: 0, scale: 0.5 }}
                   transition={{ duration: 0.15 }}
                   onClick={handleClear}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground/60 hover:text-foreground hover:bg-muted transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-muted-foreground/40 hover:text-foreground hover:bg-muted/80 transition-colors"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </motion.button>
               )}
             </AnimatePresence>
           </div>
         </motion.div>
 
-        {/* Filter Dropdown - Right Side */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-            <SlidersHorizontal className="h-4 w-4" />
-            <span className="font-medium">Sort</span>
-          </div>
-          <Select
-            value={sortBy}
-            //   @ts-ignore
-            onValueChange={setSortBy}
-          >
-            <SelectTrigger className="h-14 w-[200px] rounded-2xl border-border/50 bg-card shadow-sm focus:ring-2 focus:ring-primary/20 focus:ring-offset-0 text-sm font-medium">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="hidden md:inline text-sm text-muted-foreground/50 font-medium">
+            Sort
+          </span>
+          <Select value={sortBy} onValueChange={handleSortChange}>
+            <SelectTrigger className="h-12 w-[180px] rounded-xl border-border/50 bg-card shadow-sm focus:ring-1 focus:ring-primary/20 focus:ring-offset-0 text-sm font-medium">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="rounded-xl border-border/50">
-              <SelectItem value="newest" className="rounded-lg">
+              <SelectItem value="newest" className="rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
                   Newest first
                 </div>
               </SelectItem>
-              <SelectItem value="oldest" className="rounded-lg">
+              <SelectItem value="oldest" className="rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-3.5 w-3.5" />
                   Oldest first
                 </div>
               </SelectItem>
-              <SelectItem value="price-low" className="rounded-lg">
+              <SelectItem value="price-low" className="rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <ArrowUp className="h-3.5 w-3.5" />
                   Price: Low to High
                 </div>
               </SelectItem>
-              <SelectItem value="price-high" className="rounded-lg">
+              <SelectItem value="price-high" className="rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <ArrowDown className="h-3.5 w-3.5" />
                   Price: High to Low
                 </div>
               </SelectItem>
-              <SelectItem value="views" className="rounded-lg">
-                <div className="flex items-center gap-2">
-                  <Eye className="h-3.5 w-3.5" />
-                  Most viewed
-                </div>
-              </SelectItem>
             </SelectContent>
           </Select>
+
+          <Separator
+            orientation="vertical"
+            className="h-7 hidden sm:block mx-1"
+          />
+
+          <div className="flex items-center rounded-xl border border-border/50 bg-card p-0.5 shadow-sm">
+            <Toggle
+              pressed={viewMode === "grid"}
+              onPressedChange={() => setViewMode("grid")}
+              aria-label="Grid view"
+              className="h-9 w-9 rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Toggle>
+            <Toggle
+              pressed={viewMode === "list"}
+              onPressedChange={() => setViewMode("list")}
+              aria-label="List view"
+              className="h-9 w-9 rounded-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >
+              <List className="h-4 w-4" />
+            </Toggle>
+          </div>
         </div>
       </div>
 
-      {/* ── Results Bar ── */}
-      <motion.div
-        className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
-        layout
-      >
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
         <Badge
           variant="outline"
-          className="rounded-full px-3.5 py-1 text-xs font-semibold bg-primary/5 border-primary/20 text-primary"
+          className="rounded-full px-3.5 py-1 text-[11px] font-semibold bg-primary/5 border-primary/20 text-primary"
         >
-          {filteredCount} of {totalCars} cars
+          {filteredCount} of {totalCars} vehicles
         </Badge>
         {searchQuery && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 text-muted-foreground"
-          >
-            <span className="text-border">|</span>
-            <span>
-              Searching for{" "}
-              <span className="font-semibold text-foreground bg-muted px-2 py-0.5 rounded-md">
-                &quot;{searchQuery}&quot;
-              </span>
+          <span className="text-muted-foreground/50 text-xs">
+            Searching for{" "}
+            <span className="font-medium text-foreground bg-muted px-2 py-0.5 rounded-md">
+              &quot;{searchQuery}&quot;
             </span>
-            <button
-              onClick={handleClear}
-              className="ml-1 text-muted-foreground/60 hover:text-destructive transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </motion.div>
+          </span>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
 
 /* ─────────────────────────────────────────────
-   MAIN COMPONENT (Fixed: hooks always called)
+   MAIN COMPONENT
    ───────────────────────────────────────────── */
 
 interface SalesCarListProps {
@@ -535,15 +889,13 @@ interface SalesCarListProps {
 }
 
 export function SalesCarList({ result }: SalesCarListProps) {
-  // ALL HOOKS must be called unconditionally at the top
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
-  // Extract data (safe even if result is bad)
-  const cars = result.data ?? [];
+  const cars = useMemo(() => result.data ?? [], [result.data]);
   const totalCount = result.count ?? cars.length;
 
-  // Filter + Sort - always called, works on empty array if error
   const filteredCars = useMemo(() => {
     let filtered = [...cars];
 
@@ -554,7 +906,8 @@ export function SalesCarList({ result }: SalesCarListProps) {
           car.title.toLowerCase().includes(q) ||
           car.brand.toLowerCase().includes(q) ||
           car.model.toLowerCase().includes(q) ||
-          car.year.toString().includes(q),
+          car.year.toString().includes(q) ||
+          (car.seo?.metaDescription?.toLowerCase().includes(q) ?? false),
       );
     }
 
@@ -571,93 +924,95 @@ export function SalesCarList({ result }: SalesCarListProps) {
       case "price-high":
         filtered.sort((a, b) => b.price - a.price);
         break;
-      case "views":
-        filtered.sort((a, b) => b.views - a.views);
-        break;
     }
 
     return filtered;
   }, [cars, searchQuery, sortBy]);
 
-  // NOW check for error (after all hooks)
   if (!result.success) {
     return <ErrorState error={result.error} />;
   }
 
-  // Check empty state (after all hooks)
   if (cars.length === 0) {
     return <EmptyState />;
   }
 
   return (
-    <section className="py-12 lg:py-20">
+    <section className="py-10 lg:py-16">
       <div className="mx-auto w-[min(1400px,92%)]">
-        {/* ── Header ── */}
+        {/* Header */}
         <motion.div
           variants={headerVariants}
           initial="hidden"
           animate="show"
-          className="mb-12 text-center"
+          className="mb-10 text-center"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.1, duration: 0.4 }}
+          <Badge
+            variant="secondary"
+            className="mb-4 rounded-full bg-primary/8 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/8 border-0"
           >
-            <Badge
-              variant="secondary"
-              className="mb-5 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary hover:bg-primary/10 border-0"
-            >
-              <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-              {totalCount} Vehicles Available
-            </Badge>
-          </motion.div>
+            <Sparkles className="mr-2 h-3.5 w-3.5" />
+            {totalCount} Premium Vehicles
+          </Badge>
 
-          <motion.h1
-            className="text-4xl font-bold tracking-tight text-foreground lg:text-5xl xl:text-6xl"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-          >
+          <h1 className="text-3xl font-bold tracking-tight text-foreground lg:text-4xl xl:text-5xl">
             Cars for Sale
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-          >
-            Premium vehicles, inspected and verified.
-          </motion.p>
+          <p className="mx-auto mt-3 max-w-lg text-base text-muted-foreground/70">
+            Hand-picked, inspected, and ready to drive. Find your perfect match.
+          </p>
         </motion.div>
 
-        {/* ── Search & Filter Bar ── */}
+        {/* Search & Filter */}
         <SearchFilterBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           sortBy={sortBy}
           setSortBy={setSortBy}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
           totalCars={totalCount}
           filteredCount={filteredCars.length}
         />
 
-        {/* ── Grid ── */}
-        <motion.div
-          layout
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredCars.map((car, index) => (
-              <CarCard key={car.id} car={car} index={index} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        {/* Grid View */}
+        <AnimatePresence mode="wait">
+          {viewMode === "grid" && (
+            <motion.div
+              key="grid-view"
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+              {filteredCars.map((car, index) => (
+                <GridCarCard key={`grid-${car.id}`} car={car} index={index} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* ── Empty after filter ── */}
+        {/* List View */}
+        <AnimatePresence mode="wait">
+          {viewMode === "list" && (
+            <motion.div
+              key="list-view"
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+              className="flex flex-col gap-4"
+            >
+              {filteredCars.map((car, index) => (
+                <ListCarCard key={`list-${car.id}`} car={car} index={index} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Empty */}
         {filteredCars.length === 0 && searchQuery && (
           <EmptyState
             searchQuery={searchQuery}
@@ -665,13 +1020,13 @@ export function SalesCarList({ result }: SalesCarListProps) {
           />
         )}
 
-        {/* ── View All ── */}
+        {/* View All */}
         {totalCount > 8 && filteredCars.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="mt-14 text-center"
           >
             <Button
@@ -680,7 +1035,7 @@ export function SalesCarList({ result }: SalesCarListProps) {
               className="group rounded-full border-2 px-10 py-6 text-sm font-semibold transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/20"
             >
               View All {totalCount} Cars
-              <ArrowRight className="ml-2.5 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </Button>
           </motion.div>
         )}
@@ -695,36 +1050,33 @@ export function SalesCarList({ result }: SalesCarListProps) {
 
 export function SalesCarListSkeleton() {
   return (
-    <section className="py-12 lg:py-20">
+    <section className="py-10 lg:py-16">
       <div className="mx-auto w-[min(1400px,92%)]">
-        {/* Header Skeleton */}
-        <div className="mb-12 text-center space-y-4">
+        <div className="mb-10 text-center space-y-3">
           <Skeleton className="mx-auto h-8 w-40 rounded-full" />
-          <Skeleton className="mx-auto h-14 w-72 rounded-xl" />
-          <Skeleton className="mx-auto h-6 w-96 rounded-lg" />
+          <Skeleton className="mx-auto h-12 w-64 rounded-xl" />
+          <Skeleton className="mx-auto h-5 w-96 rounded-lg" />
         </div>
 
-        {/* Search Bar Skeleton */}
-        <div className="mb-10 space-y-5">
-          <div className="flex gap-4">
-            <Skeleton className="h-14 flex-1 max-w-2xl rounded-2xl" />
-            <Skeleton className="h-14 w-[200px] rounded-2xl" />
+        <div className="mb-8 space-y-4">
+          <div className="flex gap-3">
+            <Skeleton className="h-12 flex-1 max-w-2xl rounded-xl" />
+            <Skeleton className="h-12 w-[280px] rounded-xl" />
           </div>
-          <Skeleton className="h-6 w-32 rounded-full" />
+          <Skeleton className="h-5 w-32 rounded-full" />
         </div>
 
-        {/* Grid Skeleton */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Card key={i} className="overflow-hidden border-border/40">
+            <Card
+              key={`skeleton-${i}`}
+              className="overflow-hidden border-border/40 rounded-2xl"
+            >
               <Skeleton className="aspect-4/3 w-full" />
-              <CardContent className="space-y-3.5 p-5">
-                <Skeleton className="h-3.5 w-16 rounded-md" />
-                <Skeleton className="h-7 w-full rounded-lg" />
-                <Skeleton className="h-4 w-28 rounded-md" />
-                <div className="pt-2">
-                  <Skeleton className="h-4 w-full rounded-md" />
-                </div>
+              <CardContent className="space-y-3 p-5">
+                <Skeleton className="h-3 w-16 rounded-lg" />
+                <Skeleton className="h-14 w-full rounded-xl" />
+                <Skeleton className="h-4 w-28 rounded-lg" />
               </CardContent>
             </Card>
           ))}

@@ -9,7 +9,6 @@ import { APPNavBarLazy } from "@/components/general/(landing)/(navbar)/navbar-la
 import { UserSyncLazy } from "@/components/general/(common)/auth/user-sync.lazy";
 import { LastSeenTracker } from "@/components/general/(common)/auth/last-seen-tracker";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -43,26 +42,24 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col relative overflow-x-hidden bg-background">
         <ClerkProvider>
-
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-          <TooltipProvider>
-            {/* Main Content */}
-            <main className="flex-1 relative z-10">
-              <APPNavBarLazy/>
-              <UserSyncLazy/>
-             <LastSeenTracker />
-              {children}
-            <Footer />
-            </main>
-
-          </TooltipProvider>
-        </ThemeProvider>
-          </ClerkProvider>
+            <TooltipProvider>
+              {/* Main Content */}
+              <main className="flex-1 relative z-10">
+                <APPNavBarLazy />
+                {/* <UserSyncLazy/> */}
+                {/* <LastSeenTracker /> */}
+                {children}
+                <Footer />
+              </main>
+            </TooltipProvider>
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

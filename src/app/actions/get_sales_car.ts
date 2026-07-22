@@ -25,6 +25,7 @@ const getAllSaleCarsCached = unstable_cache(
       },
       include: {
         images: true,
+        seo: true,
       },
     });
 
