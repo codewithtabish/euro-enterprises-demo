@@ -19,7 +19,7 @@ const watermarkPath = path.join(
   process.cwd(),
   "public",
   "logos",
-  "watermark.png",
+  "watermark_two.png",
 );
 
 /**
@@ -30,7 +30,7 @@ async function getOriginalWatermarkBuffer(): Promise<Buffer> {
   if (!fs.existsSync(watermarkPath)) {
     throw new Error(
       `Watermark file not found at: ${watermarkPath}. ` +
-        `Please ensure public/logos/watermark.png exists.`,
+        `Please ensure public/logos/watermark_two.png exists.`,
     );
   }
 
@@ -39,7 +39,7 @@ async function getOriginalWatermarkBuffer(): Promise<Buffer> {
 
 /**
  * Resize the watermark proportionally to fit the target image.
- * The watermark will be ~30% of the image width (within 25–35% range).
+ * The watermark will be ~75% of the image width (luxury dealership style).
  * Never larger than the image. Preserves aspect ratio. Keeps PNG transparency.
  */
 async function resizeWatermark(
@@ -52,10 +52,10 @@ async function resizeWatermark(
   const wmOriginalWidth = wmMeta.width ?? 500;
   const wmOriginalHeight = wmMeta.height ?? 200;
 
-  // Target watermark width: 30% of image width
-  let targetWidth = Math.round(targetImageWidth * 0.3);
+  // Target watermark width: 75% of image width (luxury branding size)
+  let targetWidth = Math.round(targetImageWidth * 0.75);
 
-  // Ensure watermark never exceeds image dimensions
+  // Ensure watermark never exceeds image dimensions (strict safety for Sharp composite)
   targetWidth = Math.min(targetWidth, targetImageWidth);
 
   // Calculate proportional height to preserve aspect ratio
@@ -70,7 +70,7 @@ async function resizeWatermark(
     targetWidth = Math.round(targetHeight / aspectRatio);
   }
 
-  // Final safety clamp
+  // Final safety clamp — guarantees watermark ≤ image dimensions
   targetWidth = Math.min(targetWidth, targetImageWidth);
   targetHeight = Math.min(targetHeight, targetImageHeight);
 
@@ -105,19 +105,115 @@ async function resizeWatermark(
 }
 
 /**
+ * Apply opacity to the watermark by modifying the alpha channel.
+ * Opacity: 15% (0.15) for premium subtle branding.
+ * Preserves PNG transparency.
+ */
+async function applyWatermarkOpacity(
+  watermarkBuffer: Buffer,
+  opacity: number,
+): Promise<Buffer> {
+  const meta = await sharp(watermarkBuffer).metadata();
+  const width = meta.width ?? 1;
+  const height = meta.height ?? 1;
+
+  // Ensure alpha channel exists, then modify alpha values
+  const { data, info } = await sharp(watermarkBuffer)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const pixelCount = info.width * info.height;
+  const channels = info.channels; // 4 after ensureAlpha (RGBA)
+
+  for (let i = 0; i < pixelCount; i++) {
+    const alphaIndex = i * channels + 3;
+    data[alphaIndex] = Math.round(data[alphaIndex] * opacity);
+  }
+
+  const fadedBuffer = await sharp(data, {
+    raw: {
+      width: info.width,
+      height: info.height,
+      channels: info.channels,
+    },
+  })
+    .png()
+    .toBuffer();
+
+  return fadedBuffer;
+}
+
+/**
+ * Pad the watermark with transparent space at the top to push it down
+ * from the top edge when composited with gravity: "north".
+ * This achieves the ~60px offset without using top/left coordinates.
+ */
+async function padWatermarkForTopOffset(
+  watermarkBuffer: Buffer,
+  imageWidth: number,
+  imageHeight: number,
+  topOffset: number,
+): Promise<Buffer> {
+  const wmMeta = await sharp(watermarkBuffer).metadata();
+  const wmWidth = wmMeta.width ?? 1;
+  const wmHeight = wmMeta.height ?? 1;
+
+  // Total canvas: same width as image, watermark height + top offset
+  // Height is clamped to never exceed image height
+  const canvasHeight = Math.min(wmHeight + topOffset, imageHeight);
+  const canvasWidth = imageWidth;
+
+  // Center the watermark horizontally on the canvas
+  const left = Math.round((canvasWidth - wmWidth) / 2);
+  const top = topOffset;
+
+  console.log(
+    "[Watermark] Canvas dimensions:",
+    canvasWidth,
+    "x",
+    canvasHeight,
+    "| Watermark placed at:",
+    left,
+    "x",
+    top,
+  );
+
+  return sharp({
+    create: {
+      width: canvasWidth,
+      height: canvasHeight,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 }, // Fully transparent
+    },
+  })
+    .composite([
+      {
+        input: watermarkBuffer,
+        left: Math.max(0, left),
+        top: top,
+      },
+    ])
+    .png()
+    .toBuffer();
+}
+
+/**
  * Upload a watermarked image to S3.
  *
  * Pipeline:
  * 1. Receive image as number[] (Server Action compatible)
  * 2. Auto-rotate via EXIF
  * 3. Resize to max 1920px width
- * 4. Resize watermark proportionally (25–35% of image width)
- * 5. Composite watermark centered with blend: "over"
- * 6. Convert to WebP quality 90
- * 7. Strip EXIF
- * 8. Save debug.webp locally
- * 9. Upload processed buffer to S3
- * 10. Return S3 URL
+ * 4. Resize watermark proportionally (~75% of image width)
+ * 5. Apply 15% opacity for premium subtle branding
+ * 6. Pad watermark with transparent top offset (~60px)
+ * 7. Composite watermark at upper-center using gravity: "north"
+ * 8. Convert to WebP quality 90
+ * 9. Strip EXIF
+ * 10. Save debug.webp locally
+ * 11. Upload processed buffer to S3
+ * 12. Return S3 URL
  */
 export async function uploadWatermarkedImage(
   fileData: number[],
@@ -195,14 +291,34 @@ export async function uploadWatermarkedImage(
       wmResizedMeta.height,
     );
 
-    // ── 6. Composite watermark onto image ─────────────────────────────
-    // CRITICAL: The watermark MUST be smaller than or equal to the image.
-    // We already ensured this in resizeWatermark().
+    // ── 6. Apply premium opacity (15%) ─────────────────────────────────
+    const OPACITY = 0.15; // 15% opacity for luxury subtle branding
+    const watermarkFadedBuffer = await applyWatermarkOpacity(
+      watermarkResizedBuffer,
+      OPACITY,
+    );
+    console.log("[Upload] Watermark opacity applied:", OPACITY * 100 + "%");
+
+    // ── 7. Pad watermark with transparent top offset ──────────────────
+    const TOP_OFFSET = 60;
+    const paddedWatermarkBuffer = await padWatermarkForTopOffset(
+      watermarkFadedBuffer,
+      finalWidth,
+      finalHeight,
+      TOP_OFFSET,
+    );
+    console.log(
+      "[Upload] Watermark padded with top offset:",
+      TOP_OFFSET + "px",
+    );
+
+    // ── 8. Composite watermark onto image (upper-center) ──────────────
+    // Using gravity: "north" — Sharp requires gravity alone, no top/left offsets
     const watermarkedBuffer = await sharp(resizedBuffer)
       .composite([
         {
-          input: watermarkResizedBuffer,
-          gravity: "center",
+          input: paddedWatermarkBuffer,
+          gravity: "north",
           blend: "over",
         },
       ])
@@ -213,14 +329,14 @@ export async function uploadWatermarkedImage(
       .withMetadata({ exif: {} }) // strip EXIF
       .toBuffer();
 
-    console.log("[Upload] Watermark composited successfully");
+    console.log("[Upload] Watermark composited successfully at north");
 
-    // ── 7. Save debug file locally ────────────────────────────────────
+    // ── 9. Save debug file locally ────────────────────────────────────
     const debugPath = path.join(process.cwd(), "debug.webp");
     await fs.promises.writeFile(debugPath, watermarkedBuffer);
     console.log("[Upload] Debug file saved to:", debugPath);
 
-    // ── 8. Upload processed buffer to S3 ──────────────────────────────
+    // ── 10. Upload processed buffer to S3 ─────────────────────────────
     const sanitizedName = fileName
       .replace(/\.[^/.]+$/, "")
       .replace(/[^a-zA-Z0-9-]/g, "-");

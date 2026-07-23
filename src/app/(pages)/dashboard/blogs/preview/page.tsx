@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { BlogPreviewer } from "@/components/dashboard/blogs/create-blog/blog-previewer";
 
-export default function BlogPreviewPage() {
+// @ts-ignore
+
+export default function BlogPreviewPage(props) {
   const [content] = useState(() => {
     if (typeof window === "undefined") return null;
 
@@ -16,12 +18,9 @@ export default function BlogPreviewPage() {
     }
   });
 
-
-
   if (!content?.content?.blocks?.length) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        
         <p>No content to preview. Go back and click Preview.</p>
       </div>
     );
@@ -31,7 +30,6 @@ export default function BlogPreviewPage() {
     <div className="min-h-screen bg-background py-10 px-4">
       <div className="max-w-4xl mx-auto prose dark:prose-invert">
         <BlogPreviewer content={content.content} />
-     
       </div>
     </div>
   );
