@@ -21,7 +21,7 @@ export default function BlogPreviewPage(props) {
   if (!content?.content?.blocks?.length) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        <p>No content to preview. Go back and click Preview.</p>
+        <p>No content to preview. Go back and click Preview and again.</p>
       </div>
     );
   }
